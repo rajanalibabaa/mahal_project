@@ -83,12 +83,12 @@ export default function Navbar() {
           sx={{ 
             color: 'white', 
             fontWeight: 'bold',
-            fontSize: '1.5rem',
+            fontSize: '1rem',
             letterSpacing: '1px',
             textShadow: '0 2px 4px rgba(0, 0, 0, 0.52)'
           }}
         >
-          Mahal Project
+          TTV Mahal
         </Typography>
         <IconButton 
           onClick={handleDrawerToggle} 
@@ -224,7 +224,7 @@ export default function Navbar() {
                 }
               }}
             >
-              Mahal Project
+              TTV Mahal A/C
             </Typography>
 
             {/* Desktop Navigation */}
