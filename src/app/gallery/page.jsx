@@ -24,125 +24,60 @@ const Gallery = () => {
       title: "Explore Nature",
       description: "Discover the beauty of the natural world",
       image:
-        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Tech Innovations",
-      image:
-        "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Ave Adventures",
-      image:
-        "https://images.unsplash.com/photo-1452570053594-1b985d6ea890?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Artistic Expressions",
-      image:
-        "https://images.unsplash.com/photo-1541961017774-22349e4a1262?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Sports & Fitness",
-      image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Sports & Fitness",
-      image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Sports & Fitness",
-      image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Sports & Fitness",
-      image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Sports & Fitness",
-      image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Sports & Fitness",
-      image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Sports & Fitness",
-      image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Sports & Fitness",
-      image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
+        "/gallery/download.jpg",
+    },{
       title: "Explore Nature",
       description: "Discover the beauty of the natural world",
       image:
-        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Tech Innovations",
+        "/gallery/download.jpg",
+    },{
+      title: "Explore Nature",
+      description: "Discover the beauty of the natural world",
       image:
-        "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Ave Adventures",
+        "/gallery/download.jpg",
+    },{
+      title: "Explore Nature",
+      description: "Discover the beauty of the natural world",
       image:
-        "https://images.unsplash.com/photo-1452570053594-1b985d6ea890?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Artistic Expressions",
+        "/gallery/download.jpg",
+    },{
+      title: "Explore Nature",
+      description: "Discover the beauty of the natural world",
       image:
-        "https://images.unsplash.com/photo-1541961017774-22349e4a1262?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Sports & Fitness",
+        "/gallery/download.jpg",
+    },{
+      title: "Explore Nature",
+      description: "Discover the beauty of the natural world",
       image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Sports & Fitness",
+        "/gallery/download.jpg",
+    },{
+      title: "Explore Nature",
+      description: "Discover the beauty of the natural world",
       image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Sports & Fitness",
+        "/gallery/download.jpg",
+    },{
+      title: "Explore Nature",
+      description: "Discover the beauty of the natural world",
       image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Sports & Fitness",
+        "/gallery/download.jpg",
+    },{
+      title: "Explore Nature",
+      description: "Discover the beauty of the natural world",
       image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Sports & Fitness",
+        "/gallery/download.jpg",
+    },{
+      title: "Explore Nature",
+      description: "Discover the beauty of the natural world",
       image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Sports & Fitness",
+        "/gallery/download.jpg",
+    },{
+      title: "Explore Nature",
+      description: "Discover the beauty of the natural world",
       image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
+        "/gallery/download.jpg",
     },
-    {
-      title: "Sports & Fitness",
-      image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-    {
-      title: "Sports & Fitness",
-      image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=384",
-    },
-  ];
+  ]
+  
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // mobile screen
  const handleImageOnclick = (image) => {
