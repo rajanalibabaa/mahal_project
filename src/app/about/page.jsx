@@ -2,23 +2,18 @@
 import React, { useState, useEffect } from "react";
 import {
   Container,
-  Grid,
   Card,
-  CardContent,
   Typography,
   Box,
   Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
   Paper,
-  useTheme,
-  useMediaQuery,
-  Fade,
   alpha,
   Button,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Fade,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -29,73 +24,104 @@ import LocalParkingIcon from "@mui/icons-material/LocalParking";
 import KitchenIcon from "@mui/icons-material/Kitchen";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
-import InfoIcon from "@mui/icons-material/Info";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import GavelIcon from "@mui/icons-material/Gavel";
 
 const MotionBox = motion(Box);
 const MotionCard = motion(Card);
 
 export default function PricingSection() {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
-  // ============= Data =============
   const halls = [
     {
       name: "Thirumal Thirumagal Hall",
-      image: "/thirumal-hall-banner.jpg",
-      gradient: "linear-gradient(135deg,#FF6B6B 0%,#FF8E53 100%)",
+      image: "/thirumal.png",
       color: "#FF6B6B",
       features: [
-        { label: "Rent", value: "₹3,00,000", icon: <CurrencyRupeeIcon /> },
-        { label: "Caution Deposit", value: "₹1,05,000", icon: <CurrencyRupeeIcon /> },
-        { label: "Capacity", value: "1000 persons", icon: <GroupsIcon /> },
-        { label: "Marriage Hall", value: "First Floor (650 A/C)", icon: <MeetingRoomIcon /> },
-        { label: "Dining Hall", value: "Ground Floor (250 A/C)", icon: <MeetingRoomIcon /> },
-        { label: "A/C Rooms", value: "11 incl. Bridal Suite", icon: <AcUnitIcon /> },
-        { label: "Vessels", value: "1000 persons", icon: <KitchenIcon /> },
-        { label: "Parking", value: "Shared - Cars & Bikes", icon: <LocalParkingIcon /> },
+        { label: "Rent", icon: <CurrencyRupeeIcon /> },
+        { label: "Caution Deposit / Maintenance charges", icon: <InfoOutlinedIcon /> },
+        { label: "Taxes ( at present 18% )", icon: <GavelIcon /> },
+        { label: "Total Capacity ( persons )", icon: <GroupsIcon /> },
+        { label: "Marriage Hall", icon: <MeetingRoomIcon /> },
+        { label: "Seating Capacity ( persons )", icon: <MeetingRoomIcon /> },
+        { label: "Dining Hall", icon: <MeetingRoomIcon /> },
+        { label: "A/C Rooms ( including Bride and Bridegroom )", icon: <AcUnitIcon /> },
+        { label: "Cooking Vessels and Serving Vessels", icon: <KitchenIcon /> },
+        { label: "Parking space for Cars & Two wheelers", icon: <LocalParkingIcon /> },
       ],
     },
     {
       name: "Shri Meenakshi Sundarar Hall",
-      image: "/meenakshi-hall-banner.jpg",
-      gradient: "linear-gradient(135deg,#667EEA 0%,#764BA2 100%)",
+      image: "/thirumal.png",
       color: "#667EEA",
       features: [
-        { label: "Rent", value: "₹1,75,000", icon: <CurrencyRupeeIcon /> },
-        { label: "Caution Deposit", value: "₹95,000", icon: <CurrencyRupeeIcon /> },
-        { label: "Capacity", value: "1000 persons", icon: <GroupsIcon /> },
-        { label: "Marriage Hall", value: "3rd Floor (600 A/C)", icon: <MeetingRoomIcon /> },
-        { label: "Dining Hall", value: "4th Floor (200)", icon: <MeetingRoomIcon /> },
-        { label: "A/C Rooms", value: "6 incl. Bridal Suite", icon: <AcUnitIcon /> },
-        { label: "Vessels", value: "1000 persons", icon: <KitchenIcon /> },
-        { label: "Parking", value: "Shared - Cars & Bikes", icon: <LocalParkingIcon /> },
+        { label: "Rent", icon: <CurrencyRupeeIcon /> },
+        { label: "Caution Deposit / Maintenance charges", icon: <InfoOutlinedIcon /> },
+        { label: "Taxes ( at present 18% )", icon: <GavelIcon /> },
+        { label: "Total Capacity ( persons )", icon: <GroupsIcon /> },
+        { label: "Marriage Hall", icon: <MeetingRoomIcon /> },
+        { label: "Seating Capacity ( persons )", icon: <MeetingRoomIcon /> },
+        { label: "Dining Hall", icon: <MeetingRoomIcon /> },
+        { label: "A/C Rooms ( including Bride and Bridegroom )", icon: <AcUnitIcon /> },
+        { label: "Cooking Vessels and Serving Vessels", icon: <KitchenIcon /> },
+        { label: "Parking space for Cars & Two wheelers", icon: <LocalParkingIcon /> },
       ],
     },
   ];
 
-  const services = [
+  const cautionServices = [
     "Mugappu Pandal",
     "Plantain Trees (2 Nos)",
-    "Decorative Serial Lights",
-    "Security at Car Parking",
-    "Water & Gas Supply",
+    "Decorative Serial Lights at Mandapam",
+    "Security at Car Parking Area",
+    "Water Supply",
+    "Gas Cylinder",
     "Electricity",
-    "Hall & Room Cleaning",
-    "Vessel Cleaning",
-    "Waste Disposal & Sanitation",
-    "Generator Standby (extra running cost)",
+    "Marriage & Dining Hall Cleaning",
+    "Rooms Cleaning",
+    "Vessels Cleaning",
+    "Leaf Removal",
+    "Garbage Cleaning",
+    "Sanitary Charges",
+    "Generator Standby (running charges extra)",
   ];
 
-  // ============= Animation Variants =============  
+  const terms = [
+    "Outside Flower and Interior Decorators are not allowed.",
+    "Outside items (Cooking vessels, cameras, sound equipment) need prior approval.",
+    "Stage power usage should not exceed 3000 watts.",
+    "Management is not responsible for valuables or belongings.",
+    "Do not use the Lift for shifting materials.",
+    "Children must be accompanied while using the Lift.",
+    "Bookings must be informed at least one day earlier.",
+    "All Government Rules including CORONA guidelines must be followed.",
+    "Marriage Packages available on request.",
+    "Cancellation not allowed; postponement only. No refund.",
+    "GST charged extra as applicable.",
+    "By booking, you agree to all terms.",
+  ];
+
   const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
 
   return (
-    <Box sx={{  py: { xs: 5, md: 15 } }}>
+    <Box
+      sx={{
+        fontFamily: "'Inter', 'Roboto', sans-serif",
+        backgroundImage: "url('/aboutbg2.webp')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        py: 5,
+       
+      }}
+    >
       <Container maxWidth="lg">
         {/* Title */}
         <MotionBox
@@ -103,150 +129,231 @@ export default function PricingSection() {
           initial="hidden"
           animate="visible"
           transition={{ duration: 0.6 }}
-          height={300}
-          width={"100%"}
-          sx={{ background:'url("/aboutbg.jpg") center/cover no-repeat',textAlign: "center", mb: 6 }}
-
+          textAlign="center"
+          mt={10}
+          mb={8}
         >
-          <Typography
-            variant="h3"
-            sx={{
-              fontWeight: 800,
-              background: "linear-gradient(135deg,#FF6B6B 0%,#667EEA 100%)",
-              backgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              mb: 2,
-              fontSize: { xs: 40, md: 50 },
-            }}
-          >
-            Pricing & Capacity
-          </Typography>
-          <Typography sx={{ color: "#fff", fontSize: 18,  maxWidth: 650, mx: "auto" }}>
-            Transparent pricing and modern facilities for your grand events.
-          </Typography>
+          <Box>
+            <Typography
+              variant="h2"
+              sx={{
+                fontWeight: 900,
+                background: "linear-gradient(135deg,#FF6B6B 0%,#667EEA 100%)",
+                backgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                mb: 2,
+                fontSize: { xs: 36, md: 54 },
+              }}
+            >
+              Transparent Pricing & Modern Facilities
+            </Typography>
+            <Typography
+              sx={{ color: "white", fontSize: 18, maxWidth: 700, mx: "auto" }}
+            >
+              Discover our halls with clear pricing, included services, and terms
+              designed for your peace of mind.
+            </Typography>
+          </Box>
         </MotionBox>
 
-        {/* Important Note */}
+        {/* Note */}
         <Fade in={mounted} timeout={800}>
-          <Paper sx={{ p: 3, borderRadius: 3, mb: 6, background: alpha("#fdcb6e", 0.2) }}>
-            <Box display="flex" alignItems="flex-start" gap={2}>
-              <InfoIcon sx={{ color: "#e17055", fontSize: 30 }} />
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>Important Information</Typography>
-                <Typography>
-                  Rent is for 24 hrs (2 PM–2 PM). Extra hours charged{" "}
-                  <b style={{ color: "#e17055" }}>₹5,000/hr</b>.
-                </Typography>
-              </Box>
-            </Box>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 3,
+              borderRadius: 4,
+              mb: 8,
+              backdropFilter: "blur(10px)",
+              background: alpha("#ffffff", 0.9),
+              textAlign: "center",
+            }}
+          >
+            <Typography fontWeight={600} color="#6aef49ff">
+              Timing: (2 PM – 2 PM). Extra hours will be charged at ₹5,000/hr.
+            </Typography>
           </Paper>
         </Fade>
 
-        {/* Halls */}
-        <Grid container spacing={4}>
+        {/* Hall Cards - Flex Wrapper */}
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 4,
+            justifyContent: "center",
+          }}
+        >
           {halls.map((hall, i) => (
-            <Grid key={hall.name} item xs={12} md={6}>
-              <MotionCard
-                whileHover={{ y: -8 }}
-                transition={{ duration: 0.3 }}
-                sx={{ borderRadius: 4, overflow: "hidden", boxShadow: 4 }}
-              >
-                {/* Banner */}
-                <Box sx={{ position: "relative", height: 200 }}>
-                  <Image src={hall.image} alt={hall.name} fill style={{ objectFit: "cover" }} />
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      py: 1.5,
-                      textAlign: "center",
-                      background: hall.gradient,
-                    }}
+            <MotionCard
+              key={i}
+              whileHover={{ scale: 1.03 }}
+              transition={{ duration: 0.3 }}
+              sx={{
+                width: { xs: "100%", md: "48%" }, // 2 per row on desktop
+                borderRadius: 5,
+                overflow: "hidden",
+                boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
+                backdropFilter: "blur(6px)",
+              }}
+            >
+              {/* Hall Image */}
+              <Box sx={{ position: "relative", height: 220 }}>
+                <Image
+                  src={hall.image}
+                  alt={hall.name}
+                  fill
+                  style={{ objectFit: "cover" }}
+                />
+                <Box
+                  sx={{
+                    position: "absolute",
+                    inset: 0,
+                    background: alpha("#000", 0.4),
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                    p: 3,
+                  }}
+                >
+                  <Typography
+                    variant="h5"
+                    sx={{ color: "#fff", fontWeight: 700 }}
                   >
-                    <Typography variant="h5" sx={{ color: "white", fontWeight: 700 }}>
-                      {hall.name}
-                    </Typography>
-                    <Chip label="18% GST Extra" size="small" sx={{ mt: 1, color: "white" }} />
-                  </Box>
+                    {hall.name}
+                  </Typography>
+                  {/* <Chip
+                    label="18% GST Extra"
+                    size="small"
+                    sx={{ mt: 1, bgcolor: hall.color, color: "#fff" }}
+                  /> */}
                 </Box>
+              </Box>
 
-                {/* Features */}
-                <CardContent>
-                  <TableContainer>
-                    <Table>
-                      <TableBody>
-                        {hall.features.map((f, idx) => (
-                          <TableRow key={idx} hover>
-                            <TableCell sx={{ border: "none", py: 1.5 }}>
-                              <Box display="flex" alignItems="center" gap={2}>
-                                <Box
-                                  sx={{
-                                    p: 1,
-                                    borderRadius: 2,
-                                    bgcolor: alpha(hall.color, 0.1),
-                                    color: hall.color,
-                                    display: "flex",
-                                  }}
-                                >
-                                  {f.icon}
-                                </Box>
-                                <Typography fontWeight={600}>{f.label}</Typography>
-                              </Box>
-                            </TableCell>
-                            <TableCell sx={{ border: "none", py: 1.5, fontWeight: 700 }}>
-                              {f.value}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </CardContent>
-              </MotionCard>
-            </Grid>
-          ))}
-        </Grid>
-
-        {/* Services */}
-        <Box mt={8}>
-          <Typography variant="h4" sx={{ mb: 3, fontWeight: 700, textAlign: "center" }}>
-            Included Services
-          </Typography>
-          <Grid container spacing={2}>
-            {services.map((s, idx) => (
-              <Grid item xs={12} sm={6} md={4} key={idx}>
+              {/* Features - Flex */}
+              <Box p={3}>
                 <Box
                   sx={{
                     display: "flex",
+                    flexWrap: "wrap",
                     gap: 2,
-                    p: 2,
-                    alignItems: "center",
-                    borderRadius: 2,
-                    bgcolor: alpha("#667EEA", 0.04),
-                    "&:hover": { bgcolor: alpha("#667EEA", 0.1) },
                   }}
                 >
-                  <CheckCircleIcon color="primary" fontSize="small" />
-                  <Typography variant="body2">{s}</Typography>
+                  {hall.features.map((f, idx) => (
+                    <Box
+                      key={idx}
+                      sx={{
+                        flex: { xs: "1 1 100%", md: "1 1 48%" }, // 2 per row on desktop
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        p: 1.5,
+                        borderRadius: 2,
+                        bgcolor: "grey.50",
+                        "&:hover": { bgcolor: "grey.100" },
+                        transition: "0.2s",
+                      }}
+                    >
+                      <Box color="primary.main">{f.icon}</Box>
+                      <Typography variant="body2" fontWeight={600}>
+                        {f.label}
+                      </Typography>
+                    </Box>
+                  ))}
                 </Box>
-              </Grid>
+              </Box>
+            </MotionCard>
+          ))}
+        </Box>
+
+        {/* Services Covered */}
+        <Box mt={10} sx={{ background: "#ffffffff", p: "1.2rem",borderRadius:"20px" }}>
+          <Typography
+            variant="h3"
+            textAlign="center"
+            fontWeight={800}
+            mb={4}
+          >
+            Services Covered in Caution Deposit
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 2,
+            }}
+          >
+            {cautionServices.map((s, idx) => (
+              <Box
+                key={idx}
+                sx={{
+                  flex: { xs: "1 1 100%", sm: "1 1 45%", md: "1 1 30%" },
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                  p: 2,
+                  borderRadius: 3,
+                  bgcolor: alpha("#667EEA", 0.04),
+                  "&:hover": { bgcolor: alpha("#667EEA", 0.1) },
+                  transition: "0.2s",
+                }}
+              >
+                <CheckCircleIcon color="primary" fontSize="small" />
+                <Typography variant="body2">{s}</Typography>
+              </Box>
             ))}
-          </Grid>
+          </Box>
+        </Box>
+
+        {/* Terms */}
+        <Box mt={10}sx={{ background: "#ffffffff", p: "1.2rem",borderRadius:"20px" }}>
+          <Typography
+            variant="h3"
+            textAlign="center"
+            fontWeight={800}
+            mb={4}
+          >
+            Terms & Conditions
+          </Typography>
+          <Paper
+            sx={{
+              p: 3,
+              borderRadius: 4,
+              background: alpha("#000", 0.02),
+              boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+            }}
+          >
+            <List>
+              {terms.map((t, idx) => (
+                <ListItem key={idx}>
+                  <ListItemIcon>
+                    <InfoOutlinedIcon color="error" />
+                  </ListItemIcon>
+                  <ListItemText primary={t} />
+                </ListItem>
+              ))}
+            </List>
+          </Paper>
         </Box>
 
         {/* CTA */}
-        <Box textAlign="center" mt={8}>
+        <Box textAlign="center" mt={10}>
           <Button
             variant="contained"
             startIcon={<EventAvailableIcon />}
             sx={{
-              px: 5,
-              py: 1.8,
+              mb:'20px',
+              px: 6,
+              py: 2,
               borderRadius: 99,
-              fontWeight: 700,
+              fontWeight: 800,
+              fontSize: 18,
               background: "linear-gradient(135deg,#FF6B6B 0%,#FF8E53 100%)",
+              boxShadow: "0 6px 20px rgba(255,107,107,0.4)",
+              "&:hover": {
+                background: "linear-gradient(135deg,#FF8E53 0%,#FF6B6B 100%)",
+              },
             }}
           >
             Book Now

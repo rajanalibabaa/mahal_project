@@ -97,7 +97,7 @@ const Gallery = () => {
           Photo Gallery
         </Typography>
         <Typography variant="body1" sx={{ color: "gray", mt: 1 }}>
-          Explore our educational gallery of informative and inspiring images
+          Explore our Thirumal Thirumagal Vasantha Mahal gallery of informative and inspiring images
         </Typography>
       </Box>
 
