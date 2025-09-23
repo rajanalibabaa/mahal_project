@@ -37,7 +37,7 @@ const YearMonthCalendar = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-ALtYl12MCsyn7cKaX7Xk5DqtizYXVg5gXZtDtubEFx9hXYjnRsd5zAvemFi-KNFjEw/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrcVjkAbRwTrMv0V_ZTLi2q77C2KXFF8lng_W862erHWR3IrZqQBEq2jpP5Lsj_vFE/exec";
 
   const years = Array.from({ length: 10 }, (_, i) => 2023 + i);
   const months = [
@@ -82,6 +82,7 @@ const fetchEvents = async () => {
   }
 };
 const saveEventToSheets = async (eventData) => {
+  console.log("ADADS",eventData)
   try {
     const response = await fetch(SCRIPT_URL, {
       method: "POST",
@@ -89,19 +90,20 @@ const saveEventToSheets = async (eventData) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        action: "create",
-        data: eventData
-      })
+      body: JSON.stringify(eventData)
     });
+
+    console.log("rs :",response)
     
     // Check if the response is OK
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    // if (!response.ok) {
+    //   throw new Error(`HTTP error! status: ${response.status}`);
+    // }
     
     // Parse the response as JSON
     const result = await response.json();
+    console.log("result :",result)
+    
     
     if (result.result === "success") {
       showSnackbar("Event saved successfully!", "success");
@@ -214,7 +216,6 @@ const deleteEventFromSheets = async (eventId) => {
     setSelectedYear(today.getFullYear());
     setSelectedMonth(months[today.getMonth()]);
   };
-
   // Handle modal operations
   const handleOpenModal = () => {
     setOpenModal(true);
