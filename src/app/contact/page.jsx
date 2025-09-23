@@ -7,6 +7,8 @@ export default function ContactPage() {
     number: "",
     altNumber: "",
     message: "",
+    startDateTime: "",
+    endDateTime: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -25,11 +27,14 @@ export default function ContactPage() {
     e.preventDefault();
     setLoading(true);
 
+    console.log("formData :",formData)
+
     try {
       const response = await fetch(
         "https://script.google.com/macros/s/AKfycbxoMV6OpxobuZkOkPXl0F1e08-wziZgDh9MHDKfi0uB7HH9ehQd8dkp1ER5vD8v1dkT/exec",
         {
           method: "POST",
+          mode:"no-cors",
           headers: {
             "Content-Type": "application/json",
           },
@@ -44,6 +49,8 @@ export default function ContactPage() {
         number: "",
         altNumber: "",
         message: "",
+        startDateTime: "",
+        endDateTime: "",
       });
 
       setDialog({
@@ -75,7 +82,6 @@ export default function ContactPage() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        
       }}
     >
       {/* Container with responsive layout */}
@@ -87,7 +93,7 @@ export default function ContactPage() {
           gap: "2rem",
           width: "100%",
           maxWidth: "1200px",
-          marginTop: "4rem"
+          marginTop: "4rem",
         }}
       >
         {/* Contact Form */}
@@ -102,11 +108,10 @@ export default function ContactPage() {
             boxShadow: "0px 4px 15px rgba(0,0,0,0.2)",
             backdropFilter: "blur(10px)",
             WebkitBackdropFilter: "blur(10px)",
-            
           }}
         >
           <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
-            Contact Us
+            Contact / Booking
           </h2>
 
           <form
@@ -151,6 +156,37 @@ export default function ContactPage() {
                 border: "1px solid #ccc",
               }}
             />
+
+            {/* Booking Start DateTime */}
+            <label style={{ fontWeight: "bold" }}>Booking Start</label>
+            <input
+              type="datetime-local"
+              name="startDateTime"
+              value={formData.startDateTime}
+              onChange={handleChange}
+              required
+              style={{
+                padding: "15px",
+                borderRadius: "5px",
+                border: "1px solid #ccc",
+              }}
+            />
+
+            {/* Booking End DateTime */}
+            <label style={{ fontWeight: "bold" }}>Booking End</label>
+            <input
+              type="datetime-local"
+              name="endDateTime"
+              value={formData.endDateTime}
+              onChange={handleChange}
+              required
+              style={{
+                padding: "15px",
+                borderRadius: "5px",
+                border: "1px solid #ccc",
+              }}
+            />
+
             <textarea
               name="message"
               placeholder="Write your message"
@@ -164,6 +200,7 @@ export default function ContactPage() {
                 border: "1px solid #ccc",
               }}
             />
+
             <button
               type="submit"
               disabled={loading}
