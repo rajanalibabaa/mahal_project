@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Box,
   MenuItem,
@@ -31,13 +31,13 @@ import {
   Add as AddIcon,
   Delete as DeleteIcon,
 } from "@mui/icons-material";
+import { useEffect } from "react";
 
 const YearMonthCalendar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrcVjkAbRwTrMv0V_ZTLi2q77C2KXFF8lng_W862erHWR3IrZqQBEq2jpP5Lsj_vFE/exec";
 
   const years = Array.from({ length: 10 }, (_, i) => 2023 + i);
   const months = [
@@ -45,107 +45,39 @@ const YearMonthCalendar = () => {
     "July", "August", "September", "October", "November", "December"
   ];
 
+  const url = "https://script.google.com/macros/s/AKfycbx4x6T18wVzOXiT0wR1LR_jjXINVnRXShzEqlMFJBGx5oSSZ9xf0PN2HqKlk4ey-2PVIQ/exec"
+
   const today = new Date();
+  const [Events, setEvents] = useState([])
   const [selectedYear, setSelectedYear] = useState(today.getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(months[today.getMonth()]);
   const [openModal, setOpenModal] = useState(false);
   const [newEventDate, setNewEventDate] = useState("");
   const [newEventTitle, setNewEventTitle] = useState("");
   const [customEvents, setCustomEvents] = useState([]);
-  const [loading, setLoading] = useState(false);
 
-  // Fetch events from Google Sheets on component mount and when month/year changes
   useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const res = await fetch(url
+        );
+        const data = await res.json();
+        console.log(" data :",data)
+
+        if (data.status === "success") {
+          setEvents(data.data); 
+        } else {
+          console.error("Error:", data.message);
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchEvents();
-  }, [selectedYear, selectedMonth]);
-
-const fetchEvents = async () => {
-  setLoading(true);
-  try {
-    const response = await fetch(SCRIPT_URL);
-    
-    // Check if the response is OK
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const events = await response.json();
-    setCustomEvents(events.filter(event => {
-      const eventDate = new Date(event.date);
-      return eventDate.getFullYear() === selectedYear && 
-             eventDate.getMonth() === months.indexOf(selectedMonth);
-    }));
-  } catch (error) {
-    showSnackbar("Error fetching events: " + error.message, "error");
-  } finally {
-    setLoading(false);
-  }
-};
-const saveEventToSheets = async (eventData) => {
-  console.log("ADADS",eventData)
-  try {
-    const response = await fetch(SCRIPT_URL, {
-      method: "POST",
-      mode:"no-cors",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(eventData)
-    });
-
-    console.log("rs :",response)
-    
-    // Check if the response is OK
-    // if (!response.ok) {
-    //   throw new Error(`HTTP error! status: ${response.status}`);
-    // }
-    
-    // Parse the response as JSON
-    const result = await response.json();
-    console.log("result :",result)
-    
-    
-    if (result.result === "success") {
-      showSnackbar("Event saved successfully!", "success");
-      fetchEvents(); // Refresh events
-      return result.id;
-    } else {
-      throw new Error(result.result || "Unknown error");
-    }
-  } catch (error) {
-    showSnackbar("Error saving event: " + error.message, "error");
-  }
-};
-
-const deleteEventFromSheets = async (eventId) => {
-  try {
-    const response = await fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        action: "delete",
-        id: eventId
-      })
-    });
-    
-    // Check if the response is OK
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const result = await response.json();
-    if (result.result === "success") {
-      showSnackbar("Event deleted successfully!", "success");
-      fetchEvents(); // Refresh events
-    } else {
-      throw new Error(result.result || "Unknown error");
-    }
-  } catch (error) {
-    showSnackbar("Error deleting event: " + error.message, "error");
-  }
-};
+  }, []);
 
   const showSnackbar = (message, severity) => {
     setSnackbar({ open: true, message, severity });
@@ -227,20 +159,41 @@ const deleteEventFromSheets = async (eventId) => {
     setNewEventTitle("");
   };
 
-  const handleAddEvent = async () => {
-    if (newEventDate && newEventTitle) {
-      const newEvent = {
-        title: newEventTitle,
-        date: newEventDate
-      };
-      
-      await saveEventToSheets(newEvent);
-      handleCloseModal();
-    }
+const handleAddEvent = async () => {
+  console.log("newEventTitle:", newEventTitle);
+  console.log("newEventDate:", newEventDate);
+
+  const data = {
+    title: newEventTitle,
+    date: newEventDate,
   };
 
-  const handleDeleteEvent = async (eventId) => {
-    await deleteEventFromSheets(eventId);
+  try {
+    const response = await fetch(url,
+      {
+        method: "POST",
+        mode:"no-cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    handleCloseModal()
+
+
+
+    
+  } catch (error) {
+    console.error("Error sending event:", error);
+  }
+};
+
+
+  const handleDeleteEvent = (eventId) => {
+    setCustomEvents(prev => prev.filter(event => event.id !== eventId));
+    showSnackbar("Event deleted successfully!", "success");
   };
 
   // Build calendar grid with only actual days
