@@ -45,7 +45,7 @@ const YearMonthCalendar = () => {
     "July", "August", "September", "October", "November", "December"
   ];
 
-  const url = "https://script.google.com/macros/s/AKfycbx4x6T18wVzOXiT0wR1LR_jjXINVnRXShzEqlMFJBGx5oSSZ9xf0PN2HqKlk4ey-2PVIQ/exec"
+  const url = "https://script.google.com/macros/s/AKfycbzMPVsy-J5UVRhJbhTtOfXh-IqrmeDskrQ3AXVzx2X8rWGHYREVKzGduIwhHTB9ZMZJbA/exec"
 
   const today = new Date();
   const [Events, setEvents] = useState([])
@@ -181,9 +181,9 @@ const handleAddEvent = async () => {
       }
     );
 
-    const result = await response.json(); 
-    console.log("Response:", result);
-
+    // const result = await response?.json(); 
+    // console.log("Response:", result);
+handleCloseModal()
     
   } catch (error) {
     console.error("Error sending event:", error);
