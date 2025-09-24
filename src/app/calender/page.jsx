@@ -23,6 +23,7 @@ import {
   ListItemSecondaryAction,
   Snackbar,
   Alert,
+  Popover,
 } from "@mui/material";
 import {
   ChevronLeft,
@@ -43,6 +44,10 @@ const YearMonthCalendar = () => {
     severity: "success",
   });
 
+  // Hover popover state
+  const [hoverAnchor, setHoverAnchor] = useState(null);
+  const [hoverEventData, setHoverEventData] = useState(null);
+
   const years = Array.from({ length: 10 }, (_, i) => 2023 + i);
   const months = [
     "January",
@@ -59,17 +64,19 @@ const YearMonthCalendar = () => {
     "December",
   ];
 
- 
-  const url = "https://script.google.com/macros/s/AKfycbyCcV6rVwRiXLQyKcKL6G64hW7G7wV_Ocx7Ndn04mz0DwZwMizHI-BR62JCjCAknVpjFQ/exec"
-
+  const url =
+    "https://script.google.com/macros/s/AKfycbyP_1JUo0WVrjtCkWsAFmGkb3ocrJ0-IV8s1blzbW0q-K0YxmaX1zqhafSVUQXszSy1Sg/exec";
 
   const today = new Date();
   const [Events, setEvents] = useState([]);
   const [selectedYear, setSelectedYear] = useState(today.getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(months[today.getMonth()]);
   const [openModal, setOpenModal] = useState(false);
-  const [newEventDate, setNewEventDate] = useState("");
-  const [newEventTitle, setNewEventTitle] = useState("");
+  const [newEventStartDate, setNewEventStartDate] = useState("");
+  const [newEventStartTime, setNewEventStartTime] = useState("10:00");
+  const [newEventEndDate, setNewEventEndDate] = useState("");
+  const [newEventEndTime, setNewEventEndTime] = useState("18:00");
+  const [newEventTitle, setNewEventTitle] = useState("Marriage");
   const [customEvents, setCustomEvents] = useState([]);
   const [dropdownValue, setDropdownValue] = useState("TTV");
   const [loading, setLoading] = useState(true);
@@ -104,45 +111,42 @@ const YearMonthCalendar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  // Hover handlers
+  const handleMouseEnter = (event, dayData) => {
+    if (dayData.events.length > 0) {
+      setHoverAnchor(event.currentTarget);
+      setHoverEventData(dayData);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setHoverAnchor(null);
+    setHoverEventData(null);
+  };
+
+  // Format date and time for display
+  const formatDateTime = (dateString, timeString = "") => {
+    const date = new Date(dateString);
+    if (timeString) {
+      return `${date.toLocaleDateString()} ${timeString}`;
+    }
+    return date.toLocaleDateString();
+  };
+
   // Sample events data combined with custom events
   const events = useMemo(() => {
-    const sampleEvents = [
-      {
-        date: new Date(selectedYear, months.indexOf(selectedMonth), 5),
-        title: "Meeting",
-        id: "event-1",
-        mahal: "TTV"
-      },
-      {
-        date: new Date(selectedYear, months.indexOf(selectedMonth), 12),
-        title: "Birthday",
-        id: "event-2",
-        mahal: "SMSH"
-      },
-      {
-        date: new Date(selectedYear, months.indexOf(selectedMonth), 18),
-        title: "Conference",
-        id: "event-3",
-        mahal: "TTV"
-      },
-      {
-        date: new Date(selectedYear, months.indexOf(selectedMonth), 22),
-        title: "Dinner",
-        id: "event-4",
-        mahal: "SMSH"
-      },
-    ];
-
     // Filter custom events for the current month and year
     const filteredCustomEvents = customEvents.filter((event) => {
-      const eventDate = new Date(event.date || event.Date || event.date || event.Date);
+      const eventDate = new Date(
+        event.date || event.Date || event.startDate || event.StartDate
+      );
       return (
         eventDate.getFullYear() === selectedYear &&
         eventDate.getMonth() === months.indexOf(selectedMonth)
       );
     });
 
-    return [ ...filteredCustomEvents];
+    return [...filteredCustomEvents];
   }, [selectedYear, selectedMonth, customEvents]);
 
   const monthIndex = months.indexOf(selectedMonth);
@@ -179,19 +183,29 @@ const YearMonthCalendar = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setNewEventDate("");
+    setNewEventStartDate("");
+    setNewEventStartTime("10:00");
+    setNewEventEndDate("");
+    setNewEventEndTime("18:00");
     setNewEventTitle("");
   };
 
   const handleAddEvent = async () => {
     console.log("newEventTitle:", newEventTitle);
-    console.log("newEventDate:", newEventDate);
-    console.log("dropdownValue",dropdownValue)
+    console.log("newEventStartDate:", newEventStartDate);
+    console.log("newEventStartTime:", newEventStartTime);
+    console.log("newEventEndDate:", newEventEndDate);
+    console.log("newEventEndTime:", newEventEndTime);
+    console.log("dropdownValue", dropdownValue);
 
     const data = {
       title: newEventTitle,
-      date: newEventDate,
-      mahal: dropdownValue
+      date: newEventStartDate, // Keep for backward compatibility
+      startDate: newEventStartDate,
+      startTime: newEventStartTime,
+      endDate: newEventEndDate,
+      endTime: newEventEndTime,
+      mahal: dropdownValue,
     };
 
     try {
@@ -203,7 +217,7 @@ const YearMonthCalendar = () => {
         },
         body: JSON.stringify(data),
       });
-
+      handleCloseModal();
       // Refresh events after adding
       const res = await fetch(url);
       const result = await res.json();
@@ -211,7 +225,6 @@ const YearMonthCalendar = () => {
         setCustomEvents(result.data);
       }
 
-      handleCloseModal();
       showSnackbar("Event added successfully!", "success");
     } catch (error) {
       console.error("Error sending event:", error);
@@ -234,9 +247,9 @@ const YearMonthCalendar = () => {
       const dayOfWeek = date.getDay();
       const dayEvents = events.filter(
         (event) =>
-          new Date(event.date || event.Date).getDate() === d &&
-          new Date(event.date || event.Date).getMonth() === monthIndex &&
-          new Date(event.date || event.Date).getFullYear() === selectedYear
+          new Date(event.date || event.Date || event.startDate || event.StartDate).getDate() === d &&
+          new Date(event.date || event.Date || event.startDate || event.StartDate).getMonth() === monthIndex &&
+          new Date(event.date || event.Date || event.startDate || event.StartDate).getFullYear() === selectedYear
       );
 
       // Determine the color based on events for this day
@@ -245,8 +258,12 @@ const YearMonthCalendar = () => {
       let bottomColor = "transparent";
 
       if (dayEvents.length > 0) {
-        const hasTTV = dayEvents.some(event => event.mahal || event.Mahal === "TTV");
-        const hasSMSH = dayEvents.some(event => event.mahal || event.Mahal === "SMSH");
+        const hasTTV = dayEvents.some(
+          (event) => event.mahal || event.Mahal === "TTV"
+        );
+        const hasSMSH = dayEvents.some(
+          (event) => event.mahal || event.Mahal === "SMSH"
+        );
 
         if (hasTTV && hasSMSH) {
           // Both TTV and SMSH events - split colors
@@ -255,20 +272,20 @@ const YearMonthCalendar = () => {
         } else if (hasTTV) {
           // Only TTV events - red top
           topColor = "#ff4444"; // Red
-          bottomColor = "transparent";
+          bottomColor = "white";
         } else if (hasSMSH) {
           // Only SMSH events - green bottom
-          topColor = "transparent";
+          topColor = "white";
           bottomColor = "#44ff44"; // Green
         }
       }
 
-      days.push({ 
-        day: d, 
-        dayOfWeek, 
+      days.push({
+        day: d,
+        dayOfWeek,
         events: dayEvents,
         topColor,
-        bottomColor
+        bottomColor,
       });
     }
 
@@ -491,11 +508,13 @@ const YearMonthCalendar = () => {
                 dayData.day === today.getDate();
 
               // Determine background based on TTV/SMSH events
-              const background = dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent" 
-                ? `linear-gradient(to bottom, ${dayData.topColor} 50%, ${dayData.bottomColor} 50%)`
-                : isToday
-                ? "linear-gradient(to bottom, #1976d9 50%, #42a5f5 50%)"
-                : "linear-gradient(to bottom, #f5f5f5 50%, #e0e0e0 50%)";
+              const background =
+                dayData.topColor !== "transparent" ||
+                dayData.bottomColor !== "transparent"
+                  ? `linear-gradient(to bottom, ${dayData.topColor} 50%, ${dayData.bottomColor} 50%)`
+                  : isToday
+                  ? "linear-gradient(to bottom, #1976d9 50%, #42a5f5 50%)"
+                  : "linear-gradient(to bottom, #f5f5f2 50%, #e0e0e0 50%)";
 
               return (
                 <Grid
@@ -506,6 +525,8 @@ const YearMonthCalendar = () => {
                 >
                   <Paper
                     elevation={2}
+                    onMouseEnter={(e) => handleMouseEnter(e, dayData)}
+                    onMouseLeave={handleMouseLeave}
                     sx={{
                       height: {
                         xs: 45,
@@ -522,23 +543,28 @@ const YearMonthCalendar = () => {
                       justifyContent: "space-between",
                       p: { xs: 0.5, sm: 1 },
                       borderRadius: "12px",
-                      background: background,
-                      color: isToday || (dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent") 
-                        ? "white" 
-                        : "text.primary",
+                      // background: background,
+                      color:
+                        isToday ||
+                        dayData.topColor !== "transparent" ||
+                        dayData.bottomColor !== "transparent"
+                          ? "white"
+                          : "text.primary",
                       border: isToday ? "2px solid" : "1px solid",
                       borderColor: isToday ? "primary.dark" : "grey.200",
                       transition: "all 0.2s ease",
                       "&:hover": {
                         transform: "translateY(-3px)",
                         boxShadow: "0 6px 12px rgba(0,0,0,0.15)",
+                        cursor: dayData.events.length > 0 ? "pointer" : "default",
                       },
                       position: "relative",
                       overflow: "hidden",
                     }}
                   >
                     {/* Color indicators for TTV/SMSH */}
-                    {(dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent") && (
+                    {(dayData.topColor !== "transparent" ||
+                      dayData.bottomColor !== "transparent") && (
                       <>
                         {dayData.topColor !== "transparent" && (
                           <Box
@@ -588,9 +614,11 @@ const YearMonthCalendar = () => {
                             sm: "0.875rem",
                             md: "1rem",
                           },
-                          textShadow: (dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent") 
-                            ? "1px 1px 2px rgba(0,0,0,0.5)" 
-                            : "none",
+                          textShadow:
+                            dayData.topColor !== "transparent" ||
+                            dayData.bottomColor !== "transparent"
+                              ? "1px 1px 2px rgba(0,0,0,0.5)"
+                              : "none",
                         }}
                       >
                         {dayData.day}
@@ -599,75 +627,55 @@ const YearMonthCalendar = () => {
                         variant="caption"
                         sx={{
                           fontWeight: 500,
-                          color: isToday || (dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent")
-                            ? "white" 
-                            : "text.secondary",
+                          color:
+                            isToday ||
+                            dayData.topColor !== "transparent" ||
+                            dayData.bottomColor !== "transparent"
+                              ? "black"
+                              : "text.secondary",
                           fontSize: {
                             xs: "0.55rem",
                             sm: "0.6rem",
                             md: "0.7rem",
                           },
-                          textShadow: (dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent") 
-                            ? "1px 1px 1px rgba(0,0,0,0.5)" 
-                            : "none",
+                          textShadow:
+                            dayData.topColor !== "transparent" ||
+                            dayData.bottomColor !== "transparent"
+                              ? "1px 1px 1px rgba(0,0,0,0.5)"
+                              : "none",
                         }}
                       >
                         {weekdays[dayData.dayOfWeek]}
                       </Typography>
                     </Box>
 
-                    {/* Events for the day */}
+                    {/* Events indicator dot */}
                     {dayData.events.length > 0 && (
                       <Box
                         sx={{
-                          mt: 0.5,
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 0.5,
-                          position: "relative",
+                          position: "absolute",
+                          bottom: 4,
+                          right: 4,
                           zIndex: 2,
+                          display: "flex",
+                          gap: 0.5,
                         }}
-                      > 
-                        {/* {dayData.events.slice(0, 2).map((event, idx) => (
-                          <Chip
+                      >
+                        {dayData.events.map((event, idx) => (
+                          <Box
                             key={idx}
-                            label={`${event.Title ||event.title} (${event.mahal || event.Mahal || event.mahal || event.Mahal})`}
-                            size="small"
                             sx={{
-                              height: "auto",
-                              py: 0.5,
-                              fontSize: "0.6rem",
-                              backgroundColor: isToday || (dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent")
-                                ? "rgba(255, 255, 255, 0.9)"
-                                : "primary.light",
-                              color: isToday || (dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent")
-                                ? "primary.main"
-                                : "white",
-                              "& .MuiChip-label": {
-                                px: 0.5,
-                                whiteSpace: "normal",
-                                textOverflow: "clip",
-                              },
+                              width: 6,
+                              height: 6,
+                              borderRadius: "50%",
+                              backgroundColor: 
+                                (event.mahal || event.Mahal) === "TTV" 
+                                  ? "#ff4444" 
+                                  : "#44ff44",
+                              border: "1px solid black",
                             }}
                           />
-                        ))} */}
-                        {/* {dayData.events.length > 2 && (
-                          <Chip
-                            label={`+${dayData.events.length - 2}`}
-                            size="small"
-                            sx={{
-                              height: "auto",
-                              py: 0.5,
-                              fontSize: "0.6rem",
-                              backgroundColor: isToday || (dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent")
-                                ? "rgba(255, 255, 255, 0.9)"
-                                : "primary.light",
-                              color: isToday || (dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent")
-                                ? "primary.main"
-                                : "white",
-                            }}
-                          />
-                        )} */}
+                        ))}
                       </Box>
                     )}
                   </Paper>
@@ -677,26 +685,51 @@ const YearMonthCalendar = () => {
           </Grid>
 
           {/* Legend */}
-          <Box sx={{ mt: 3, display: "flex", gap: 2, justifyContent: "center", flexWrap: "wrap" }}>
+          <Box
+            sx={{
+              mt: 3,
+              display: "flex",
+              gap: 2,
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Box sx={{ width: 20, height: 20, backgroundColor: "#ff4444", borderRadius: 1 }} />
+              <Box
+                sx={{
+                  width: 20,
+                  height: 20,
+                  backgroundColor: "#ff4444",
+                  borderRadius: 1,
+                }}
+              />
               <Typography variant="body2" color="white">
                 TTV Booked
               </Typography>
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Box sx={{ width: 20, height: 20, backgroundColor: "#44ff44", borderRadius: 1 }} />
+              <Box
+                sx={{
+                  width: 20,
+                  height: 20,
+                  backgroundColor: "#44ff44",
+                  borderRadius: 1,
+                }}
+              />
               <Typography variant="body2" color="white">
                 SMSH Booked
               </Typography>
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Box sx={{ 
-                width: 20, 
-                height: 20, 
-                background: "linear-gradient(to bottom, #ff4444 50%, #44ff44 50%)", 
-                borderRadius: 1 
-              }} />
+              <Box
+                sx={{
+                  width: 20,
+                  height: 20,
+                  background:
+                    "linear-gradient(to bottom, #ff4444 50%, #44ff44 50%)",
+                  borderRadius: 1,
+                }}
+              />
               <Typography variant="body2" color="white">
                 Both Booked
               </Typography>
@@ -704,6 +737,60 @@ const YearMonthCalendar = () => {
           </Box>
         </Box>
       </Box>
+
+      {/* Hover Popover for Event Details */}
+      <Popover
+        open={Boolean(hoverAnchor)}
+        anchorEl={hoverAnchor}
+        onClose={handleMouseLeave}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        sx={{
+          pointerEvents: 'none',
+        }}
+        disableRestoreFocus
+      >
+        <Box sx={{ p: 2, maxWidth: 300 }}>
+          <Typography variant="h6" gutterBottom>
+            {hoverEventData && `${selectedMonth} ${hoverEventData.day}, ${selectedYear}`}
+          </Typography>
+          {hoverEventData && hoverEventData.events.length > 0 ? (
+            <Box>
+              {hoverEventData.events.map((event, index) => (
+                <Box key={index} sx={{ mb: 1, p: 1, backgroundColor: 'grey.100', borderRadius: 1 }}>
+                  <Typography variant="subtitle1" fontWeight="bold">
+                    {event.Title || event.title}
+                  </Typography>
+                  <Typography variant="body2">
+                    Mahal: {event.mahal || event.Mahal}
+                  </Typography>
+                  <Typography variant="body2">
+                    Start: {formatDateTime(event.startDate || event.date || event.Date, event.startTime)}
+                  </Typography>
+                  {event.endDate && (
+                    <Typography variant="body2">
+                      End: {formatDateTime(event.endDate, event.endTime)}
+                    </Typography>
+                  )}
+                  <Typography variant="caption" color="text.secondary">
+                    {!event.endDate && "Single day event"}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              No events on this date
+            </Typography>
+          )}
+        </Box>
+      </Popover>
 
       {/* Add Event Modal */}
       <Dialog
@@ -715,22 +802,74 @@ const YearMonthCalendar = () => {
         <DialogTitle>Add New Event</DialogTitle>
         <DialogContent>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
+            {/* Start Date and Time */}
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <TextField
+                label="Event Start Date"
+                type="date"
+                value={newEventStartDate}
+                onChange={(e) => setNewEventStartDate(e.target.value)}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                fullWidth
+              />
+              <TextField
+                label="Start Time"
+                type="time"
+                value={newEventStartTime}
+                onChange={(e) => setNewEventStartTime(e.target.value)}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                fullWidth
+              />
+            </Box>
+
+            {/* End Date and Time */}
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <TextField
+                label="Event End Date"
+                type="date"
+                value={newEventEndDate}
+                onChange={(e) => setNewEventEndDate(e.target.value)}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                fullWidth
+              />
+              <TextField
+                label="End Time"
+                type="time"
+                value={newEventEndTime}
+                onChange={(e) => setNewEventEndTime(e.target.value)}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                fullWidth
+              />
+            </Box>
+
             <TextField
-              label="Event Date"
-              type="date"
-              value={newEventDate}
-              onChange={(e) => setNewEventDate(e.target.value)}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              fullWidth
-            />
-            <TextField
+              select
               label="Event Title"
               value={newEventTitle}
               onChange={(e) => setNewEventTitle(e.target.value)}
               fullWidth
-            />
+            >
+              <MenuItem value="Marriage">Marriage</MenuItem>
+              <MenuItem value="Reception">Reception</MenuItem>
+              <MenuItem value="Engagement">Engagement</MenuItem>
+              <MenuItem value="WeddingAnniversary">WeddingAnniversary</MenuItem>
+              <MenuItem value="Seemantham/Valaikappu">
+                Seemantham/Valaikappu
+              </MenuItem>
+              <MenuItem value="Poonool/Upanayanam">Poonool/Upanayanam</MenuItem>
+              <MenuItem value="Sangeet & Mehandi">Sangeet & Mehandi</MenuItem>
+              <MenuItem value="BirthDay">BirthDay</MenuItem>
+              <MenuItem value="Puberty">Puberty</MenuItem>
+              <MenuItem value="Others">Others</MenuItem>
+            </TextField>
             <TextField
               select
               label="Select Option"
@@ -745,7 +884,7 @@ const YearMonthCalendar = () => {
 
           {/* List of custom events for the selected month */}
           {customEvents.filter((event) => {
-            const eventDate = new Date(event.date || event.Date);
+            const eventDate = new Date(event.date || event.Date || event.startDate || event.StartDate);
             return (
               eventDate.getFullYear() === selectedYear &&
               eventDate.getMonth() === months.indexOf(selectedMonth)
@@ -758,7 +897,7 @@ const YearMonthCalendar = () => {
               <List>
                 {customEvents
                   .filter((event) => {
-                    const eventDate = new Date(event.date || event.Date);
+                    const eventDate = new Date(event.date || event.Date || event.startDate || event.StartDate);
                     return (
                       eventDate.getFullYear() === selectedYear &&
                       eventDate.getMonth() === months.indexOf(selectedMonth)
@@ -768,7 +907,24 @@ const YearMonthCalendar = () => {
                     <ListItem key={event.id}>
                       <ListItemText
                         primary={event.Title || event.title}
-                        secondary={`${new Date( event.date || event.Date || event.date || event.Date).toLocaleDateString()} - ${event.mahal || event.Mahal}`}
+                        secondary={
+                          <Box>
+                            <Typography variant="body2">
+                              Start: {formatDateTime(
+                                event.startDate || event.date || event.Date, 
+                                event.startTime
+                              )}
+                            </Typography>
+                            {event.endDate && (
+                              <Typography variant="body2">
+                                End: {formatDateTime(event.endDate, event.endTime)}
+                              </Typography>
+                            )}
+                            <Typography variant="body2">
+                              Mahal: {event.mahal || event.Mahal}
+                            </Typography>
+                          </Box>
+                        }
                       />
                       <ListItemSecondaryAction>
                         <IconButton
@@ -790,7 +946,7 @@ const YearMonthCalendar = () => {
           <Button
             onClick={handleAddEvent}
             variant="contained"
-            disabled={!newEventDate || !newEventTitle}
+            disabled={!newEventStartDate || !newEventTitle}
           >
             Add Event
           </Button>
