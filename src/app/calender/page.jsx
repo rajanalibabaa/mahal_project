@@ -22,7 +22,7 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   Snackbar,
-  Alert
+  Alert,
 } from "@mui/material";
 import {
   ChevronLeft,
@@ -37,40 +37,57 @@ const YearMonthCalendar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   const years = Array.from({ length: 10 }, (_, i) => 2023 + i);
   const months = [
-    "January", "February", "March", "April", "May", "June", 
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
-  const url = "https://script.google.com/macros/s/AKfycbx4x6T18wVzOXiT0wR1LR_jjXINVnRXShzEqlMFJBGx5oSSZ9xf0PN2HqKlk4ey-2PVIQ/exec"
+ 
+  const url = "https://script.google.com/macros/s/AKfycbyCcV6rVwRiXLQyKcKL6G64hW7G7wV_Ocx7Ndn04mz0DwZwMizHI-BR62JCjCAknVpjFQ/exec"
+
 
   const today = new Date();
-  const [Events, setEvents] = useState([])
+  const [Events, setEvents] = useState([]);
   const [selectedYear, setSelectedYear] = useState(today.getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(months[today.getMonth()]);
   const [openModal, setOpenModal] = useState(false);
   const [newEventDate, setNewEventDate] = useState("");
   const [newEventTitle, setNewEventTitle] = useState("");
   const [customEvents, setCustomEvents] = useState([]);
+  const [dropdownValue, setDropdownValue] = useState("TTV");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await fetch(url
-        );
+        const res = await fetch(url);
         const data = await res.json();
-        console.log(" data :",data)
+        console.log("Fetched data:", data);
 
         if (data.status === "success") {
-          setEvents(data.data); 
+          setCustomEvents(data.data);
         } else {
           console.error("Error:", data.message);
         }
       } catch (err) {
-        console.error("Fetch error:", err);
+        console.error("Fetch error:");
       } finally {
         setLoading(false);
       }
@@ -94,32 +111,38 @@ const YearMonthCalendar = () => {
         date: new Date(selectedYear, months.indexOf(selectedMonth), 5),
         title: "Meeting",
         id: "event-1",
+        mahal: "TTV"
       },
       {
         date: new Date(selectedYear, months.indexOf(selectedMonth), 12),
         title: "Birthday",
         id: "event-2",
+        mahal: "SMSH"
       },
       {
         date: new Date(selectedYear, months.indexOf(selectedMonth), 18),
         title: "Conference",
         id: "event-3",
+        mahal: "TTV"
       },
       {
         date: new Date(selectedYear, months.indexOf(selectedMonth), 22),
         title: "Dinner",
         id: "event-4",
+        mahal: "SMSH"
       },
     ];
 
     // Filter custom events for the current month and year
-    const filteredCustomEvents = customEvents.filter(event => {
-      const eventDate = new Date(event.date);
-      return eventDate.getFullYear() === selectedYear && 
-             eventDate.getMonth() === months.indexOf(selectedMonth);
+    const filteredCustomEvents = customEvents.filter((event) => {
+      const eventDate = new Date(event.date || event.Date || event.date || event.Date);
+      return (
+        eventDate.getFullYear() === selectedYear &&
+        eventDate.getMonth() === months.indexOf(selectedMonth)
+      );
     });
 
-    return [...sampleEvents, ...filteredCustomEvents];
+    return [ ...filteredCustomEvents];
   }, [selectedYear, selectedMonth, customEvents]);
 
   const monthIndex = months.indexOf(selectedMonth);
@@ -148,6 +171,7 @@ const YearMonthCalendar = () => {
     setSelectedYear(today.getFullYear());
     setSelectedMonth(months[today.getMonth()]);
   };
+
   // Handle modal operations
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -159,40 +183,44 @@ const YearMonthCalendar = () => {
     setNewEventTitle("");
   };
 
-const handleAddEvent = async () => {
-  console.log("newEventTitle:", newEventTitle);
-  console.log("newEventDate:", newEventDate);
+  const handleAddEvent = async () => {
+    console.log("newEventTitle:", newEventTitle);
+    console.log("newEventDate:", newEventDate);
+    console.log("dropdownValue",dropdownValue)
 
-  const data = {
-    title: newEventTitle,
-    date: newEventDate,
-  };
+    const data = {
+      title: newEventTitle,
+      date: newEventDate,
+      mahal: dropdownValue
+    };
 
-  try {
-    const response = await fetch(url,
-      {
+    try {
+      const response = await fetch(url, {
         method: "POST",
-        mode:"no-cors",
+        mode: "no-cors",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
+      });
+
+      // Refresh events after adding
+      const res = await fetch(url);
+      const result = await res.json();
+      if (result.status === "success") {
+        setCustomEvents(result.data);
       }
-    );
 
-    handleCloseModal()
-
-
-
-    
-  } catch (error) {
-    console.error("Error sending event:", error);
-  }
-};
-
+      handleCloseModal();
+      showSnackbar("Event added successfully!", "success");
+    } catch (error) {
+      console.error("Error sending event:", error);
+      showSnackbar("Error adding event!", "error");
+    }
+  };
 
   const handleDeleteEvent = (eventId) => {
-    setCustomEvents(prev => prev.filter(event => event.id !== eventId));
+    setCustomEvents((prev) => prev.filter((event) => event.id !== eventId));
     showSnackbar("Event deleted successfully!", "success");
   };
 
@@ -206,11 +234,42 @@ const handleAddEvent = async () => {
       const dayOfWeek = date.getDay();
       const dayEvents = events.filter(
         (event) =>
-          new Date(event.date).getDate() === d &&
-          new Date(event.date).getMonth() === monthIndex &&
-          new Date(event.date).getFullYear() === selectedYear
+          new Date(event.date || event.Date).getDate() === d &&
+          new Date(event.date || event.Date).getMonth() === monthIndex &&
+          new Date(event.date || event.Date).getFullYear() === selectedYear
       );
-      days.push({ day: d, dayOfWeek, events: dayEvents });
+
+      // Determine the color based on events for this day
+      let dayColor = "default";
+      let topColor = "transparent";
+      let bottomColor = "transparent";
+
+      if (dayEvents.length > 0) {
+        const hasTTV = dayEvents.some(event => event.mahal || event.Mahal === "TTV");
+        const hasSMSH = dayEvents.some(event => event.mahal || event.Mahal === "SMSH");
+
+        if (hasTTV && hasSMSH) {
+          // Both TTV and SMSH events - split colors
+          topColor = "#ff4444"; // Red for TTV (top)
+          bottomColor = "#44ff44"; // Green for SMSH (bottom)
+        } else if (hasTTV) {
+          // Only TTV events - red top
+          topColor = "#ff4444"; // Red
+          bottomColor = "transparent";
+        } else if (hasSMSH) {
+          // Only SMSH events - green bottom
+          topColor = "transparent";
+          bottomColor = "#44ff44"; // Green
+        }
+      }
+
+      days.push({ 
+        day: d, 
+        dayOfWeek, 
+        events: dayEvents,
+        topColor,
+        bottomColor
+      });
     }
 
     return days;
@@ -431,6 +490,13 @@ const handleAddEvent = async () => {
                 monthIndex === today.getMonth() &&
                 dayData.day === today.getDate();
 
+              // Determine background based on TTV/SMSH events
+              const background = dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent" 
+                ? `linear-gradient(to bottom, ${dayData.topColor} 50%, ${dayData.bottomColor} 50%)`
+                : isToday
+                ? "linear-gradient(to bottom, #1976d9 50%, #42a5f5 50%)"
+                : "linear-gradient(to bottom, #f5f5f5 50%, #e0e0e0 50%)";
+
               return (
                 <Grid
                   item
@@ -456,10 +522,10 @@ const handleAddEvent = async () => {
                       justifyContent: "space-between",
                       p: { xs: 0.5, sm: 1 },
                       borderRadius: "12px",
-                      backgroundColor: isToday
-                        ? "primary.main"
-                        : "background.paper",
-                      color: isToday ? "white" : "text.primary",
+                      background: background,
+                      color: isToday || (dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent") 
+                        ? "white" 
+                        : "text.primary",
                       border: isToday ? "2px solid" : "1px solid",
                       borderColor: isToday ? "primary.dark" : "grey.200",
                       transition: "all 0.2s ease",
@@ -467,14 +533,50 @@ const handleAddEvent = async () => {
                         transform: "translateY(-3px)",
                         boxShadow: "0 6px 12px rgba(0,0,0,0.15)",
                       },
+                      position: "relative",
+                      overflow: "hidden",
                     }}
                   >
-                    {/* Day Number and Day of Week */}
+                    {/* Color indicators for TTV/SMSH */}
+                    {(dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent") && (
+                      <>
+                        {dayData.topColor !== "transparent" && (
+                          <Box
+                            sx={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              height: "50%",
+                              backgroundColor: dayData.topColor,
+                              zIndex: 1,
+                            }}
+                          />
+                        )}
+                        {dayData.bottomColor !== "transparent" && (
+                          <Box
+                            sx={{
+                              position: "absolute",
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              height: "50%",
+                              backgroundColor: dayData.bottomColor,
+                              zIndex: 1,
+                            }}
+                          />
+                        )}
+                      </>
+                    )}
+
+                    {/* Top Section (Day + Weekday) */}
                     <Box
                       sx={{
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "flex-end",
+                        position: "relative",
+                        zIndex: 2,
                       }}
                     >
                       <Typography
@@ -486,6 +588,9 @@ const handleAddEvent = async () => {
                             sm: "0.875rem",
                             md: "1rem",
                           },
+                          textShadow: (dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent") 
+                            ? "1px 1px 2px rgba(0,0,0,0.5)" 
+                            : "none",
                         }}
                       >
                         {dayData.day}
@@ -494,12 +599,17 @@ const handleAddEvent = async () => {
                         variant="caption"
                         sx={{
                           fontWeight: 500,
-                          color: isToday ? "white" : "text.secondary",
+                          color: isToday || (dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent")
+                            ? "white" 
+                            : "text.secondary",
                           fontSize: {
                             xs: "0.55rem",
                             sm: "0.6rem",
                             md: "0.7rem",
                           },
+                          textShadow: (dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent") 
+                            ? "1px 1px 1px rgba(0,0,0,0.5)" 
+                            : "none",
                         }}
                       >
                         {weekdays[dayData.dayOfWeek]}
@@ -514,21 +624,25 @@ const handleAddEvent = async () => {
                           display: "flex",
                           flexDirection: "column",
                           gap: 0.5,
+                          position: "relative",
+                          zIndex: 2,
                         }}
-                      >
-                        {dayData.events.slice(0, 2).map((event, idx) => (
+                      > 
+                        {/* {dayData.events.slice(0, 2).map((event, idx) => (
                           <Chip
                             key={idx}
-                            label={event.title}
+                            label={`${event.Title ||event.title} (${event.mahal || event.Mahal || event.mahal || event.Mahal})`}
                             size="small"
                             sx={{
                               height: "auto",
                               py: 0.5,
                               fontSize: "0.6rem",
-                              backgroundColor: isToday
-                                ? "white"
+                              backgroundColor: isToday || (dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent")
+                                ? "rgba(255, 255, 255, 0.9)"
                                 : "primary.light",
-                              color: isToday ? "primary.main" : "white",
+                              color: isToday || (dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent")
+                                ? "primary.main"
+                                : "white",
                               "& .MuiChip-label": {
                                 px: 0.5,
                                 whiteSpace: "normal",
@@ -536,8 +650,8 @@ const handleAddEvent = async () => {
                               },
                             }}
                           />
-                        ))}
-                        {dayData.events.length > 2 && (
+                        ))} */}
+                        {/* {dayData.events.length > 2 && (
                           <Chip
                             label={`+${dayData.events.length - 2}`}
                             size="small"
@@ -545,13 +659,15 @@ const handleAddEvent = async () => {
                               height: "auto",
                               py: 0.5,
                               fontSize: "0.6rem",
-                              backgroundColor: isToday
-                                ? "white"
+                              backgroundColor: isToday || (dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent")
+                                ? "rgba(255, 255, 255, 0.9)"
                                 : "primary.light",
-                              color: isToday ? "primary.main" : "white",
+                              color: isToday || (dayData.topColor !== "transparent" || dayData.bottomColor !== "transparent")
+                                ? "primary.main"
+                                : "white",
                             }}
                           />
-                        )}
+                        )} */}
                       </Box>
                     )}
                   </Paper>
@@ -559,11 +675,43 @@ const handleAddEvent = async () => {
               );
             })}
           </Grid>
+
+          {/* Legend */}
+          <Box sx={{ mt: 3, display: "flex", gap: 2, justifyContent: "center", flexWrap: "wrap" }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box sx={{ width: 20, height: 20, backgroundColor: "#ff4444", borderRadius: 1 }} />
+              <Typography variant="body2" color="white">
+                TTV Booked
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box sx={{ width: 20, height: 20, backgroundColor: "#44ff44", borderRadius: 1 }} />
+              <Typography variant="body2" color="white">
+                SMSH Booked
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box sx={{ 
+                width: 20, 
+                height: 20, 
+                background: "linear-gradient(to bottom, #ff4444 50%, #44ff44 50%)", 
+                borderRadius: 1 
+              }} />
+              <Typography variant="body2" color="white">
+                Both Booked
+              </Typography>
+            </Box>
+          </Box>
         </Box>
       </Box>
 
       {/* Add Event Modal */}
-      <Dialog open={openModal} onClose={handleCloseModal} maxWidth="sm" fullWidth>
+      <Dialog
+        open={openModal}
+        onClose={handleCloseModal}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>Add New Event</DialogTitle>
         <DialogContent>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
@@ -583,13 +731,25 @@ const handleAddEvent = async () => {
               onChange={(e) => setNewEventTitle(e.target.value)}
               fullWidth
             />
+            <TextField
+              select
+              label="Select Option"
+              value={dropdownValue}
+              onChange={(e) => setDropdownValue(e.target.value)}
+              fullWidth
+            >
+              <MenuItem value="TTV">TTV</MenuItem>
+              <MenuItem value="SMSH">SMSH</MenuItem>
+            </TextField>
           </Box>
 
           {/* List of custom events for the selected month */}
-          {customEvents.filter(event => {
-            const eventDate = new Date(event.date);
-            return eventDate.getFullYear() === selectedYear && 
-                   eventDate.getMonth() === months.indexOf(selectedMonth);
+          {customEvents.filter((event) => {
+            const eventDate = new Date(event.date || event.Date);
+            return (
+              eventDate.getFullYear() === selectedYear &&
+              eventDate.getMonth() === months.indexOf(selectedMonth)
+            );
           }).length > 0 && (
             <Box sx={{ mt: 3 }}>
               <Typography variant="h6" gutterBottom>
@@ -597,20 +757,22 @@ const handleAddEvent = async () => {
               </Typography>
               <List>
                 {customEvents
-                  .filter(event => {
-                    const eventDate = new Date(event.date);
-                    return eventDate.getFullYear() === selectedYear && 
-                           eventDate.getMonth() === months.indexOf(selectedMonth);
+                  .filter((event) => {
+                    const eventDate = new Date(event.date || event.Date);
+                    return (
+                      eventDate.getFullYear() === selectedYear &&
+                      eventDate.getMonth() === months.indexOf(selectedMonth)
+                    );
                   })
                   .map((event) => (
                     <ListItem key={event.id}>
                       <ListItemText
-                        primary={event.title}
-                        secondary={new Date(event.date).toLocaleDateString()}
+                        primary={event.Title || event.title}
+                        secondary={`${new Date( event.date || event.Date || event.date || event.Date).toLocaleDateString()} - ${event.mahal || event.Mahal}`}
                       />
                       <ListItemSecondaryAction>
-                        <IconButton 
-                          edge="end" 
+                        <IconButton
+                          edge="end"
                           aria-label="delete"
                           onClick={() => handleDeleteEvent(event.id)}
                         >
@@ -625,8 +787,8 @@ const handleAddEvent = async () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseModal}>Cancel</Button>
-          <Button 
-            onClick={handleAddEvent} 
+          <Button
+            onClick={handleAddEvent}
             variant="contained"
             disabled={!newEventDate || !newEventTitle}
           >
@@ -636,16 +798,16 @@ const handleAddEvent = async () => {
       </Dialog>
 
       {/* Snackbar for notifications */}
-      <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={6000} 
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert 
-          onClose={handleCloseSnackbar} 
-          severity={snackbar.severity} 
-          sx={{ width: '100%' }}
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
         >
           {snackbar.message}
         </Alert>
