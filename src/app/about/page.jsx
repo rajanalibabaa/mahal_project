@@ -37,8 +37,8 @@ export default function PricingSection() {
 
   const halls = [
     {
-      name: "Thirumal Thirumagal Hall",
-      image: "/thirumal.png",
+      name: "Thirumal Thirumagal Vasantha Mahal A/C",
+      image: "/firstmahal.jpg",
       color: "#FF6B6B",
       features: [
         { label: "Rent", icon: <CurrencyRupeeIcon /> },
@@ -55,7 +55,7 @@ export default function PricingSection() {
     },
     {
       name: "Shri Meenakshi Sundarar Hall",
-      image: "/thirumal.png",
+      image: "/secondmaha;.jpg",
       color: "#667EEA",
       features: [
         { label: "Rent", icon: <CurrencyRupeeIcon /> },
@@ -129,12 +129,11 @@ export default function PricingSection() {
           "& img": {
             width: "100%",
             height: "100%",
-            objectFit: "cover",
-            filter: "blur(5px)",
+            objectFit: "contain",
           },
         }}
       >
-        <Image src="/aboutbg2.webp" alt="Background" fill style={{ objectFit: "cover" }} />
+        <Image src="/about.jpg" alt="Background" fill style={{ objectFit: "cover" }} />
       </Box>
 
       <Container maxWidth="lg" sx={{ py: 5 }}>
@@ -148,49 +147,43 @@ export default function PricingSection() {
           mt={10}
           mb={8}
         >
-          <Typography
-            variant="h2"
-            sx={{
-              fontWeight: 900,
-              background: "linear-gradient(135deg, #00e5ff 0%, #80d8ff 100%)",
-backgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              mb: 2,
-              fontSize: { xs: 36, md: 54 },
-            }}
-          >
-            Transparent Pricing & Modern Facilities
-          </Typography>
-          <Typography sx={{ color: "white", fontSize: 18, maxWidth: 700, mx: "auto" }}>
-            Discover our halls with clear pricing, included services, and terms designed for your peace of mind.
-          </Typography>
+         <Typography 
+                     variant="h1" 
+                     className={mounted ? 'animate-on-scroll' : ''}
+                     sx={{ 
+                       fontSize: { xs: '2.2rem', sm: '3rem', md: '4rem', lg: '3rem' },
+                       fontWeight: 800,
+                       textAlign: 'center',
+                       lineHeight: 1.5,
+                       background: 'linear-gradient(135deg, #ff0000ff 0%, #FFA500 50%, #ff0000ff 100%)',
+                       backgroundClip: 'text',
+                       WebkitBackgroundClip: 'text',
+                       WebkitTextFillColor: 'transparent',
+                      //  animation: `${mounted ? fadeIn : 'none'} 1s ease-out, 3s ease-in-out infinite`,
+                     //   textShadow: '0 0 30px rgba(255, 140, 0, 0.5)',
+                       letterSpacing: '-0.02em',
+                      //  opacity: mounted ? 1 : 0,
+                      //  transform: mounted ? 'translateY(0)' : 'translateY(30px)',
+                       transition: 'all 0.8s ease-out',
+                     }}
+                   >
+                     Thirumal Thirumagal Vasantha Mahal A/C  Shri Meenakshi Sundarar Hall A/C
+                   </Typography>
+                   <Typography fontWeight={800} color="#fbff07ff" fontSize={{ xs: '1rem', sm: '1.2rem', md: '1.4rem', lg: '1.2rem' }} mt={2} sx={{textShadow: '0 0 30px rgba(0, 0, 0, 0.9)'}} >
+               Day Rent Timing: (2 PM – 2 PM) hr.
+            </Typography>
         </MotionBox>
 
         {/* Notes */}
-        <Fade in={mounted} timeout={800}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 3,
-              borderRadius: 4,
-              mb: 8,
-              backdropFilter: "blur(10px)",
-              background: alpha("#ffffff", 0.85),
-              textAlign: "center",
-            }}
-          >
-            <Typography fontWeight={600} color="#35963aff">
-              Timing: (2 PM – 2 PM)hr.
-            </Typography>
-          </Paper>
-        </Fade>
+    
  <Link href={"/contact"} >
         <Box textAlign="center" mt={3}>
           <Button
             variant="contained"
             startIcon={<EventAvailableIcon />}
             sx={{
-              mb: "20px",
+              mb:{ xs: 2, md: 20 },
+              mt: { xs: 2, md: 5 },
               px: 6,
               py: 2,
               borderRadius: 99,
@@ -314,7 +307,7 @@ backgroundClip: "text",
                   gap: 2,
                   p: 2,
                   borderRadius: 3,
-                  bgcolor: alpha("#667EEA", 0.04),
+                  // bgcolor: alpha("#667EEA", 0.04),
                   "&:hover": { bgcolor: alpha("#667EEA", 0.1) },
                   transition: "0.2s",
                 }}
