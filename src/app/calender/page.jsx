@@ -22,7 +22,8 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   Snackbar,
-  Alert
+  Alert,
+  Popover,
 } from "@mui/material";
 import {
   ChevronLeft,
@@ -37,40 +38,63 @@ const YearMonthCalendar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  // Hover popover state
+  const [hoverAnchor, setHoverAnchor] = useState(null);
+  const [hoverEventData, setHoverEventData] = useState(null);
 
   const years = Array.from({ length: 10 }, (_, i) => 2023 + i);
   const months = [
-    "January", "February", "March", "April", "May", "June", 
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
-  const url = "https://script.google.com/macros/s/AKfycbzMPVsy-J5UVRhJbhTtOfXh-IqrmeDskrQ3AXVzx2X8rWGHYREVKzGduIwhHTB9ZMZJbA/exec"
+  const url =
+    "https://script.google.com/macros/s/AKfycbyP_1JUo0WVrjtCkWsAFmGkb3ocrJ0-IV8s1blzbW0q-K0YxmaX1zqhafSVUQXszSy1Sg/exec";
 
   const today = new Date();
-  const [Events, setEvents] = useState([])
+  const [Events, setEvents] = useState([]);
   const [selectedYear, setSelectedYear] = useState(today.getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(months[today.getMonth()]);
   const [openModal, setOpenModal] = useState(false);
-  const [newEventDate, setNewEventDate] = useState("");
-  const [newEventTitle, setNewEventTitle] = useState("");
+  const [newEventStartDate, setNewEventStartDate] = useState("");
+  const [newEventStartTime, setNewEventStartTime] = useState("10:00");
+  const [newEventEndDate, setNewEventEndDate] = useState("");
+  const [newEventEndTime, setNewEventEndTime] = useState("18:00");
+  const [newEventTitle, setNewEventTitle] = useState("Marriage");
   const [customEvents, setCustomEvents] = useState([]);
+  const [dropdownValue, setDropdownValue] = useState("TTV");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await fetch(url
-        );
+        const res = await fetch(url);
         const data = await res.json();
-        console.log(" data :",data)
+        console.log("Fetched data:", data);
 
         if (data.status === "success") {
-          setEvents(data.data); 
+          setCustomEvents(data.data);
         } else {
           console.error("Error:", data.message);
         }
       } catch (err) {
-        console.error("Fetch error:", err);
+        console.error("Fetch error:");
       } finally {
         setLoading(false);
       }
@@ -87,39 +111,42 @@ const YearMonthCalendar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  // Hover handlers
+  const handleMouseEnter = (event, dayData) => {
+    if (dayData.events.length > 0) {
+      setHoverAnchor(event.currentTarget);
+      setHoverEventData(dayData);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setHoverAnchor(null);
+    setHoverEventData(null);
+  };
+
+  // Format date and time for display
+  const formatDateTime = (dateString, timeString = "") => {
+    const date = new Date(dateString);
+    if (timeString) {
+      return `${date.toLocaleDateString()} ${timeString}`;
+    }
+    return date.toLocaleDateString();
+  };
+
   // Sample events data combined with custom events
   const events = useMemo(() => {
-    const sampleEvents = [
-      {
-        date: new Date(selectedYear, months.indexOf(selectedMonth), 5),
-        title: "Meeting",
-        id: "event-1",
-      },
-      {
-        date: new Date(selectedYear, months.indexOf(selectedMonth), 12),
-        title: "Birthday",
-        id: "event-2",
-      },
-      {
-        date: new Date(selectedYear, months.indexOf(selectedMonth), 18),
-        title: "Conference",
-        id: "event-3",
-      },
-      {
-        date: new Date(selectedYear, months.indexOf(selectedMonth), 22),
-        title: "Dinner",
-        id: "event-4",
-      },
-    ];
-
     // Filter custom events for the current month and year
-    const filteredCustomEvents = customEvents.filter(event => {
-      const eventDate = new Date(event.date);
-      return eventDate.getFullYear() === selectedYear && 
-             eventDate.getMonth() === months.indexOf(selectedMonth);
+    const filteredCustomEvents = customEvents.filter((event) => {
+      const eventDate = new Date(
+        event.date || event.Date || event.startDate || event.StartDate
+      );
+      return (
+        eventDate.getFullYear() === selectedYear &&
+        eventDate.getMonth() === months.indexOf(selectedMonth)
+      );
     });
 
-    return [...sampleEvents, ...filteredCustomEvents];
+    return [...filteredCustomEvents];
   }, [selectedYear, selectedMonth, customEvents]);
 
   const monthIndex = months.indexOf(selectedMonth);
@@ -156,43 +183,57 @@ const YearMonthCalendar = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setNewEventDate("");
+    setNewEventStartDate("");
+    setNewEventStartTime("10:00");
+    setNewEventEndDate("");
+    setNewEventEndTime("18:00");
     setNewEventTitle("");
   };
 
-const handleAddEvent = async () => {
-  console.log("newEventTitle:", newEventTitle);
-  console.log("newEventDate:", newEventDate);
+  const handleAddEvent = async () => {
+    console.log("newEventTitle:", newEventTitle);
+    console.log("newEventStartDate:", newEventStartDate);
+    console.log("newEventStartTime:", newEventStartTime);
+    console.log("newEventEndDate:", newEventEndDate);
+    console.log("newEventEndTime:", newEventEndTime);
+    console.log("dropdownValue", dropdownValue);
 
-  const data = {
-    title: newEventTitle,
-    date: newEventDate,
-  };
+    const data = {
+      title: newEventTitle,
+      date: newEventStartDate, // Keep for backward compatibility
+      startDate: newEventStartDate,
+      startTime: newEventStartTime,
+      endDate: newEventEndDate,
+      endTime: newEventEndTime,
+      mahal: dropdownValue,
+    };
 
-  try {
-    const response = await fetch(url,
-      {
+    try {
+      const response = await fetch(url, {
         method: "POST",
-        mode:"no-cors",
+        mode: "no-cors",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
+      });
+      handleCloseModal();
+      // Refresh events after adding
+      const res = await fetch(url);
+      const result = await res.json();
+      if (result.status === "success") {
+        setCustomEvents(result.data);
       }
-    );
 
-    // const result = await response?.json(); 
-    // console.log("Response:", result);
-handleCloseModal()
-    
-  } catch (error) {
-    console.error("Error sending event:", error);
-  }
-};
-
+      showSnackbar("Event added successfully!", "success");
+    } catch (error) {
+      console.error("Error sending event:", error);
+      showSnackbar("Error adding event!", "error");
+    }
+  };
 
   const handleDeleteEvent = (eventId) => {
-    setCustomEvents(prev => prev.filter(event => event.id !== eventId));
+    setCustomEvents((prev) => prev.filter((event) => event.id !== eventId));
     showSnackbar("Event deleted successfully!", "success");
   };
 
@@ -206,11 +247,46 @@ handleCloseModal()
       const dayOfWeek = date.getDay();
       const dayEvents = events.filter(
         (event) =>
-          new Date(event.date).getDate() === d &&
-          new Date(event.date).getMonth() === monthIndex &&
-          new Date(event.date).getFullYear() === selectedYear
+          new Date(event.date || event.Date || event.startDate || event.StartDate).getDate() === d &&
+          new Date(event.date || event.Date || event.startDate || event.StartDate).getMonth() === monthIndex &&
+          new Date(event.date || event.Date || event.startDate || event.StartDate).getFullYear() === selectedYear
       );
-      days.push({ day: d, dayOfWeek, events: dayEvents });
+
+      // Determine the color based on events for this day
+      let dayColor = "default";
+      let topColor = "transparent";
+      let bottomColor = "transparent";
+
+      if (dayEvents.length > 0) {
+        const hasTTV = dayEvents.some(
+          (event) => event.mahal || event.Mahal === "TTV"
+        );
+        const hasSMSH = dayEvents.some(
+          (event) => event.mahal || event.Mahal === "SMSH"
+        );
+
+        if (hasTTV && hasSMSH) {
+          // Both TTV and SMSH events - split colors
+          topColor = "#ff4444"; // Red for TTV (top)
+          bottomColor = "#44ff44"; // Green for SMSH (bottom)
+        } else if (hasTTV) {
+          // Only TTV events - red top
+          topColor = "#ff4444"; // Red
+          bottomColor = "white";
+        } else if (hasSMSH) {
+          // Only SMSH events - green bottom
+          topColor = "white";
+          bottomColor = "#44ff44"; // Green
+        }
+      }
+
+      days.push({
+        day: d,
+        dayOfWeek,
+        events: dayEvents,
+        topColor,
+        bottomColor,
+      });
     }
 
     return days;
@@ -431,6 +507,15 @@ handleCloseModal()
                 monthIndex === today.getMonth() &&
                 dayData.day === today.getDate();
 
+              // Determine background based on TTV/SMSH events
+              const background =
+                dayData.topColor !== "transparent" ||
+                dayData.bottomColor !== "transparent"
+                  ? `linear-gradient(to bottom, ${dayData.topColor} 50%, ${dayData.bottomColor} 50%)`
+                  : isToday
+                  ? "linear-gradient(to bottom, #1976d9 50%, #42a5f5 50%)"
+                  : "linear-gradient(to bottom, #f5f5f2 50%, #e0e0e0 50%)";
+
               return (
                 <Grid
                   item
@@ -440,6 +525,8 @@ handleCloseModal()
                 >
                   <Paper
                     elevation={2}
+                    onMouseEnter={(e) => handleMouseEnter(e, dayData)}
+                    onMouseLeave={handleMouseLeave}
                     sx={{
                       height: {
                         xs: 45,
@@ -456,25 +543,66 @@ handleCloseModal()
                       justifyContent: "space-between",
                       p: { xs: 0.5, sm: 1 },
                       borderRadius: "12px",
-                      backgroundColor: isToday
-                        ? "primary.main"
-                        : "background.paper",
-                      color: isToday ? "white" : "text.primary",
+                      // background: background,
+                      color:
+                        isToday ||
+                        dayData.topColor !== "transparent" ||
+                        dayData.bottomColor !== "transparent"
+                          ? "white"
+                          : "text.primary",
                       border: isToday ? "2px solid" : "1px solid",
                       borderColor: isToday ? "primary.dark" : "grey.200",
                       transition: "all 0.2s ease",
                       "&:hover": {
                         transform: "translateY(-3px)",
                         boxShadow: "0 6px 12px rgba(0,0,0,0.15)",
+                        cursor: dayData.events.length > 0 ? "pointer" : "default",
                       },
+                      position: "relative",
+                      overflow: "hidden",
                     }}
                   >
-                    {/* Day Number and Day of Week */}
+                    {/* Color indicators for TTV/SMSH */}
+                    {(dayData.topColor !== "transparent" ||
+                      dayData.bottomColor !== "transparent") && (
+                      <>
+                        {dayData.topColor !== "transparent" && (
+                          <Box
+                            sx={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              height: "50%",
+                              backgroundColor: dayData.topColor,
+                              zIndex: 1,
+                            }}
+                          />
+                        )}
+                        {dayData.bottomColor !== "transparent" && (
+                          <Box
+                            sx={{
+                              position: "absolute",
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              height: "50%",
+                              backgroundColor: dayData.bottomColor,
+                              zIndex: 1,
+                            }}
+                          />
+                        )}
+                      </>
+                    )}
+
+                    {/* Top Section (Day + Weekday) */}
                     <Box
                       sx={{
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "flex-end",
+                        position: "relative",
+                        zIndex: 2,
                       }}
                     >
                       <Typography
@@ -486,6 +614,11 @@ handleCloseModal()
                             sm: "0.875rem",
                             md: "1rem",
                           },
+                          textShadow:
+                            dayData.topColor !== "transparent" ||
+                            dayData.bottomColor !== "transparent"
+                              ? "1px 1px 2px rgba(0,0,0,0.5)"
+                              : "none",
                         }}
                       >
                         {dayData.day}
@@ -494,64 +627,55 @@ handleCloseModal()
                         variant="caption"
                         sx={{
                           fontWeight: 500,
-                          color: isToday ? "white" : "text.secondary",
+                          color:
+                            isToday ||
+                            dayData.topColor !== "transparent" ||
+                            dayData.bottomColor !== "transparent"
+                              ? "black"
+                              : "text.secondary",
                           fontSize: {
                             xs: "0.55rem",
                             sm: "0.6rem",
                             md: "0.7rem",
                           },
+                          textShadow:
+                            dayData.topColor !== "transparent" ||
+                            dayData.bottomColor !== "transparent"
+                              ? "1px 1px 1px rgba(0,0,0,0.5)"
+                              : "none",
                         }}
                       >
                         {weekdays[dayData.dayOfWeek]}
                       </Typography>
                     </Box>
 
-                    {/* Events for the day */}
+                    {/* Events indicator dot */}
                     {dayData.events.length > 0 && (
                       <Box
                         sx={{
-                          mt: 0.5,
+                          position: "absolute",
+                          bottom: 4,
+                          right: 4,
+                          zIndex: 2,
                           display: "flex",
-                          flexDirection: "column",
                           gap: 0.5,
                         }}
                       >
-                        {dayData.events.slice(0, 2).map((event, idx) => (
-                          <Chip
+                        {dayData.events.map((event, idx) => (
+                          <Box
                             key={idx}
-                            label={event.title}
-                            size="small"
                             sx={{
-                              height: "auto",
-                              py: 0.5,
-                              fontSize: "0.6rem",
-                              backgroundColor: isToday
-                                ? "white"
-                                : "primary.light",
-                              color: isToday ? "primary.main" : "white",
-                              "& .MuiChip-label": {
-                                px: 0.5,
-                                whiteSpace: "normal",
-                                textOverflow: "clip",
-                              },
+                              width: 6,
+                              height: 6,
+                              borderRadius: "50%",
+                              backgroundColor: 
+                                (event.mahal || event.Mahal) === "TTV" 
+                                  ? "#ff4444" 
+                                  : "#44ff44",
+                              border: "1px solid black",
                             }}
                           />
                         ))}
-                        {dayData.events.length > 2 && (
-                          <Chip
-                            label={`+${dayData.events.length - 2}`}
-                            size="small"
-                            sx={{
-                              height: "auto",
-                              py: 0.5,
-                              fontSize: "0.6rem",
-                              backgroundColor: isToday
-                                ? "white"
-                                : "primary.light",
-                              color: isToday ? "primary.main" : "white",
-                            }}
-                          />
-                        )}
                       </Box>
                     )}
                   </Paper>
@@ -559,37 +683,212 @@ handleCloseModal()
               );
             })}
           </Grid>
+
+          {/* Legend */}
+          <Box
+            sx={{
+              mt: 3,
+              display: "flex",
+              gap: 2,
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box
+                sx={{
+                  width: 20,
+                  height: 20,
+                  backgroundColor: "#ff4444",
+                  borderRadius: 1,
+                }}
+              />
+              <Typography variant="body2" color="white">
+                TTV Booked
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box
+                sx={{
+                  width: 20,
+                  height: 20,
+                  backgroundColor: "#44ff44",
+                  borderRadius: 1,
+                }}
+              />
+              <Typography variant="body2" color="white">
+                SMSH Booked
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box
+                sx={{
+                  width: 20,
+                  height: 20,
+                  background:
+                    "linear-gradient(to bottom, #ff4444 50%, #44ff44 50%)",
+                  borderRadius: 1,
+                }}
+              />
+              <Typography variant="body2" color="white">
+                Both Booked
+              </Typography>
+            </Box>
+          </Box>
         </Box>
       </Box>
 
+      {/* Hover Popover for Event Details */}
+      <Popover
+        open={Boolean(hoverAnchor)}
+        anchorEl={hoverAnchor}
+        onClose={handleMouseLeave}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        sx={{
+          pointerEvents: 'none',
+        }}
+        disableRestoreFocus
+      >
+        <Box sx={{ p: 2, maxWidth: 300 }}>
+          <Typography variant="h6" gutterBottom>
+            {hoverEventData && `${selectedMonth} ${hoverEventData.day}, ${selectedYear}`}
+          </Typography>
+          {hoverEventData && hoverEventData.events.length > 0 ? (
+            <Box>
+              {hoverEventData.events.map((event, index) => (
+                <Box key={index} sx={{ mb: 1, p: 1, backgroundColor: 'grey.100', borderRadius: 1 }}>
+                  <Typography variant="subtitle1" fontWeight="bold">
+                    {event.Title || event.title}
+                  </Typography>
+                  <Typography variant="body2">
+                    Mahal: {event.mahal || event.Mahal}
+                  </Typography>
+                  <Typography variant="body2">
+                    Start: {formatDateTime(event.startDate || event.date || event.Date, event.startTime)}
+                  </Typography>
+                  {event.endDate && (
+                    <Typography variant="body2">
+                      End: {formatDateTime(event.endDate, event.endTime)}
+                    </Typography>
+                  )}
+                  <Typography variant="caption" color="text.secondary">
+                    {!event.endDate && "Single day event"}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              No events on this date
+            </Typography>
+          )}
+        </Box>
+      </Popover>
+
       {/* Add Event Modal */}
-      <Dialog open={openModal} onClose={handleCloseModal} maxWidth="sm" fullWidth>
+      <Dialog
+        open={openModal}
+        onClose={handleCloseModal}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>Add New Event</DialogTitle>
         <DialogContent>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
+            {/* Start Date and Time */}
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <TextField
+                label="Event Start Date"
+                type="date"
+                value={newEventStartDate}
+                onChange={(e) => setNewEventStartDate(e.target.value)}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                fullWidth
+              />
+              <TextField
+                label="Start Time"
+                type="time"
+                value={newEventStartTime}
+                onChange={(e) => setNewEventStartTime(e.target.value)}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                fullWidth
+              />
+            </Box>
+
+            {/* End Date and Time */}
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <TextField
+                label="Event End Date"
+                type="date"
+                value={newEventEndDate}
+                onChange={(e) => setNewEventEndDate(e.target.value)}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                fullWidth
+              />
+              <TextField
+                label="End Time"
+                type="time"
+                value={newEventEndTime}
+                onChange={(e) => setNewEventEndTime(e.target.value)}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                fullWidth
+              />
+            </Box>
+
             <TextField
-              label="Event Date"
-              type="date"
-              value={newEventDate}
-              onChange={(e) => setNewEventDate(e.target.value)}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              fullWidth
-            />
-            <TextField
+              select
               label="Event Title"
               value={newEventTitle}
               onChange={(e) => setNewEventTitle(e.target.value)}
               fullWidth
-            />
+            >
+              <MenuItem value="Marriage">Marriage</MenuItem>
+              <MenuItem value="Reception">Reception</MenuItem>
+              <MenuItem value="Engagement">Engagement</MenuItem>
+              <MenuItem value="WeddingAnniversary">WeddingAnniversary</MenuItem>
+              <MenuItem value="Seemantham/Valaikappu">
+                Seemantham/Valaikappu
+              </MenuItem>
+              <MenuItem value="Poonool/Upanayanam">Poonool/Upanayanam</MenuItem>
+              <MenuItem value="Sangeet & Mehandi">Sangeet & Mehandi</MenuItem>
+              <MenuItem value="BirthDay">BirthDay</MenuItem>
+              <MenuItem value="Puberty">Puberty</MenuItem>
+              <MenuItem value="Others">Others</MenuItem>
+            </TextField>
+            <TextField
+              select
+              label="Select Option"
+              value={dropdownValue}
+              onChange={(e) => setDropdownValue(e.target.value)}
+              fullWidth
+            >
+              <MenuItem value="TTV">TTV</MenuItem>
+              <MenuItem value="SMSH">SMSH</MenuItem>
+            </TextField>
           </Box>
 
           {/* List of custom events for the selected month */}
-          {customEvents.filter(event => {
-            const eventDate = new Date(event.date);
-            return eventDate.getFullYear() === selectedYear && 
-                   eventDate.getMonth() === months.indexOf(selectedMonth);
+          {customEvents.filter((event) => {
+            const eventDate = new Date(event.date || event.Date || event.startDate || event.StartDate);
+            return (
+              eventDate.getFullYear() === selectedYear &&
+              eventDate.getMonth() === months.indexOf(selectedMonth)
+            );
           }).length > 0 && (
             <Box sx={{ mt: 3 }}>
               <Typography variant="h6" gutterBottom>
@@ -597,20 +896,39 @@ handleCloseModal()
               </Typography>
               <List>
                 {customEvents
-                  .filter(event => {
-                    const eventDate = new Date(event.date);
-                    return eventDate.getFullYear() === selectedYear && 
-                           eventDate.getMonth() === months.indexOf(selectedMonth);
+                  .filter((event) => {
+                    const eventDate = new Date(event.date || event.Date || event.startDate || event.StartDate);
+                    return (
+                      eventDate.getFullYear() === selectedYear &&
+                      eventDate.getMonth() === months.indexOf(selectedMonth)
+                    );
                   })
                   .map((event) => (
                     <ListItem key={event.id}>
                       <ListItemText
-                        primary={event.title}
-                        secondary={new Date(event.date).toLocaleDateString()}
+                        primary={event.Title || event.title}
+                        secondary={
+                          <Box>
+                            <Typography variant="body2">
+                              Start: {formatDateTime(
+                                event.startDate || event.date || event.Date, 
+                                event.startTime
+                              )}
+                            </Typography>
+                            {event.endDate && (
+                              <Typography variant="body2">
+                                End: {formatDateTime(event.endDate, event.endTime)}
+                              </Typography>
+                            )}
+                            <Typography variant="body2">
+                              Mahal: {event.mahal || event.Mahal}
+                            </Typography>
+                          </Box>
+                        }
                       />
                       <ListItemSecondaryAction>
-                        <IconButton 
-                          edge="end" 
+                        <IconButton
+                          edge="end"
                           aria-label="delete"
                           onClick={() => handleDeleteEvent(event.id)}
                         >
@@ -625,10 +943,10 @@ handleCloseModal()
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseModal}>Cancel</Button>
-          <Button 
-            onClick={handleAddEvent} 
+          <Button
+            onClick={handleAddEvent}
             variant="contained"
-            disabled={!newEventDate || !newEventTitle}
+            disabled={!newEventStartDate || !newEventTitle}
           >
             Add Event
           </Button>
@@ -636,16 +954,16 @@ handleCloseModal()
       </Dialog>
 
       {/* Snackbar for notifications */}
-      <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={6000} 
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert 
-          onClose={handleCloseSnackbar} 
-          severity={snackbar.severity} 
-          sx={{ width: '100%' }}
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
         >
           {snackbar.message}
         </Alert>
