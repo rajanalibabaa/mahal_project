@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const eventTypes = [
   {
@@ -380,6 +381,7 @@ export default function EventTypesGrid() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
+<Link href="/calender">
             <Button
   variant="outlined"
   size="large"
@@ -416,6 +418,7 @@ export default function EventTypesGrid() {
 >
   Book Your Event Now
 </Button>
+</Link>
 
           </motion.div>
         </motion.div>

@@ -169,9 +169,7 @@ export default function PricingSection() {
                    >
                      Thirumal Thirumagal Vasantha Mahal A/C  Shri Meenakshi Sundarar Hall A/C
                    </Typography>
-                   <Typography fontWeight={800} color="#fbff07ff" fontSize={{ xs: '1rem', sm: '1.2rem', md: '1.4rem', lg: '1.2rem' }} mt={2} sx={{textShadow: '0 0 30px rgba(0, 0, 0, 0.9)'}} >
-               Day Rent Timing: (2 PM – 2 PM) hr.
-            </Typography>
+                  
         </MotionBox>
 
         {/* Notes */}
@@ -183,7 +181,7 @@ export default function PricingSection() {
             startIcon={<EventAvailableIcon />}
             sx={{
               mb:{ xs: 2, md: 20 },
-              mt: { xs: 2, md: 5 },
+              mt: { xs: 2, md: 8 },
               px: 6,
               py: 2,
               borderRadius: 99,
@@ -262,7 +260,9 @@ export default function PricingSection() {
             </MotionCard>
           ))}
         </Box>
-
+ <Typography fontWeight={800} color="#ff0000ff" fontSize={{ xs: '1rem', sm: '1.2rem', md: '1.4rem', lg: '1.2rem' }} mt={{xs: 2, md: 4}} sx={{textAlign: 'center'}} >
+               Day Rent Timing: (2 PM – 2 PM) hr.
+            </Typography> 
                 {/* Note */}
        <Fade in={mounted} timeout={800}>
   <Paper

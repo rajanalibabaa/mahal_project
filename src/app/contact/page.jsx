@@ -1,6 +1,26 @@
 "use client";
 import React, { useState } from "react";
-
+import {
+  Box,
+  Container,
+  TextField,
+  Typography,
+  Button,
+  Paper,
+  CircularProgress,
+  IconButton,
+  InputAdornment
+  
+} from "@mui/material";
+import PhoneIcons from "@mui/icons-material/Phone";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import EmailIcon from "@mui/icons-material/Email";
+import Image from "next/image";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import EventIcon from "@mui/icons-material/Event";
+import PhoneIcon from "@mui/icons-material/Phone";
+import MessageIcon from "@mui/icons-material/Message";
+import FAQSection from "@/Components/FaqComponents";
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: "",
@@ -27,17 +47,13 @@ export default function ContactPage() {
     e.preventDefault();
     setLoading(true);
 
-    console.log("formData :",formData)
-
     try {
       const response = await fetch(
         "https://script.google.com/macros/s/AKfycbzuaevkc_4Xc3qAfq7PDvNELmeudeiCPEm6JmLj618CtNLzxVGTyuMfkjRXTjtFMUjM/exec",
         {
           method: "POST",
-          mode:"no-cors",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         }
       );
@@ -71,237 +87,403 @@ export default function ContactPage() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundImage: "url('/thirumal2.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        padding: "2rem 1rem",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      {/* Container with responsive layout */}
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          gap: "2rem",
-          width: "100%",
-          maxWidth: "1200px",
-          marginTop: "4rem",
+    <>
+   <Box
+  sx={{
+    position: "relative",
+    minHeight: "300px",
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  }}
+>
+  <Image
+    src="/contact.jpg"
+    alt="Contact"
+    fill   // fills parent container
+    style={{
+      objectFit: "cover",
+      zIndex: -1, // pushes it behind content
+    }}
+  />
+
+  <Typography
+    variant="h3"
+    sx={{ color: "#fff", fontWeight: "bold", position: "relative" }}
+  >
+    Contact Us
+      <Typography variant="subtitle1">We’d love to hear from you. Get in touch today!</Typography>
+
+  </Typography>
+</Box>
+
+    <Box
+     
+   >
+    <Box sx={{ display: "flex",justifyContent:'space-around'  }}>
+      
+      <Box  sx={{ py: 0,mt:{ xs: 5, md: 5 } ,}}>
+      <Box
+        // elevation={10}
+        sx={{
+          maxWidth: 600,
+          p: { xs: 3, md: 5 },
+          borderRadius: 4,
+          background: "linear-gradient(145deg, #ffffff, #f7f7f7)",
+          boxShadow: "0px 8px 25px rgba(0,0,0,0.15)",
         }}
       >
-        {/* Contact Form */}
-        <div
-          style={{
-            flex: "1 1 400px",
-            minWidth: "300px",
-            maxWidth: "600px",
-            padding: "30px",
-            borderRadius: "12px",
-            backgroundColor: "rgba(255, 255, 255, 0.4)",
-            boxShadow: "0px 4px 15px rgba(0,0,0,0.2)",
-            backdropFilter: "blur(10px)",
-            WebkitBackdropFilter: "blur(10px)",
+        {/* Header */}
+        <Typography
+          variant="h4"
+          align="center"
+          fontWeight="bold"
+          gutterBottom
+          sx={{
+            background: "linear-gradient(90deg,#d63939, #df3ebc)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            mb: 4,
           }}
         >
-          <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
-            Contact / Booking
-          </h2>
+           Booking
+        </Typography>
 
-          <form
-            onSubmit={handleSubmit}
-            style={{ display: "flex", flexDirection: "column", gap: "15px" }}
+        {/* Form */}
+        <form onSubmit={handleSubmit}>
+          {/* Name */}
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Full Name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            margin="normal"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <AccountCircle color="primary" />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              borderRadius: 2,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 3,
+              },
+            }}
+          />
+
+          {/* Phone */}
+          <TextField
+            fullWidth
+            type="tel"
+            variant="outlined"
+            label="Phone Number"
+            name="number"
+            value={formData.number}
+            onChange={handleChange}
+            required
+            margin="normal"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PhoneIcon color="primary" />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 3,
+              },
+            }}
+          />
+
+          {/* Alt Phone */}
+          <TextField
+            fullWidth
+            type="tel"
+            variant="outlined"
+            label="Alternate Phone Number"
+            name="altNumber"
+            value={formData.altNumber}
+            onChange={handleChange}
+            margin="normal"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PhoneIcon color="action" />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 3,
+              },
+            }}
+          />
+
+          {/* Booking Start */}
+          <TextField
+            fullWidth
+            type="datetime-local"
+            variant="outlined"
+            label="Booking Start"
+            name="startDateTime"
+            value={formData.startDateTime}
+            onChange={handleChange}
+            required
+            margin="normal"
+            InputLabelProps={{ shrink: true }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <EventIcon color="primary" />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 3,
+              },
+            }}
+          />
+
+          {/* Booking End */}
+          <TextField
+            fullWidth
+            type="datetime-local"
+            variant="outlined"
+            label="Booking End"
+            name="endDateTime"
+            value={formData.endDateTime}
+            onChange={handleChange}
+            required
+            margin="normal"
+            InputLabelProps={{ shrink: true }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <EventIcon color="error" />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 3,
+              },
+            }}
+          />
+
+          {/* Message */}
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            variant="outlined"
+            label="Message"
+            name="message"
+            value={formData.message}
+            onChange={handleChange}
+            required
+            margin="normal"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <MessageIcon color="primary" />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 3,
+              },
+            }}
+          />
+
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            fullWidth
+            disabled={loading}
+            variant="contained"
+            sx={{
+              mt: 4,
+              py: 1.5,
+              borderRadius: 3,
+              fontWeight: "bold",
+              fontSize: "1.1rem",
+              background: "linear-gradient(90deg,#d63939, #df3ebc)",
+              boxShadow: "0 4px 20px rgba(220,69,187,0.4)",
+              transition: "all 0.3s",
+              "&:hover": {
+                transform: "translateY(-3px)",
+                boxShadow: "0 6px 25px rgba(0,0,0,0.3)",
+              },
+            }}
           >
-            <input
-              type="text"
-              name="name"
-              placeholder="Enter your name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              style={{
-                padding: "15px",
-                borderRadius: "5px",
-                border: "1px solid #ccc",
-              }}
-            />
-            <input
-              type="tel"
-              name="number"
-              placeholder="Enter your phone number"
-              value={formData.number}
-              onChange={handleChange}
-              required
-              style={{
-                padding: "15px",
-                borderRadius: "5px",
-                border: "1px solid #ccc",
-              }}
-            />
-            <input
-              type="tel"
-              name="altNumber"
-              placeholder="Enter alternate phone number"
-              value={formData.altNumber}
-              onChange={handleChange}
-              style={{
-                padding: "15px",
-                borderRadius: "5px",
-                border: "1px solid #ccc",
-              }}
-            />
+            {loading ? <CircularProgress size={26} color="inherit" /> : "Submit"}
+          </Button>
+        </form>
+      </Box>
+    </Box>
+    <Box>
+    <Box sx={{ display:{xs:"none",md:"grid"}, gridTemplateColumns: "repeat(2, 2fr)", gap: "1rem",  alignContent: "center",mt:15}}>
+    <Image src="/contactbg.jpg" alt="Contact Us" width={300} height={300}  />
+    <Image src="/contactbg2.jpg" alt="Contact Us" width={300} height={300}  />
+    <Image src="/contact3.jpg" alt="Contact Us" width={300} height={300}  />
+    <Image src="/contact4.jpg" alt="Contact Us" width={300} height={300}  />
+   
+    </Box>
+    </Box>
+    </Box>
+    
 
-            {/* Booking Start DateTime */}
-            <label style={{ fontWeight: "bold" }}>Booking Start</label>
-            <input
-              type="datetime-local"
-              name="startDateTime"
-              value={formData.startDateTime}
-              onChange={handleChange}
-              required
-              style={{
-                padding: "15px",
-                borderRadius: "5px",
-                border: "1px solid #ccc",
-              }}
-            />
-
-            {/* Booking End DateTime */}
-            <label style={{ fontWeight: "bold" }}>Booking End</label>
-            <input
-              type="datetime-local"
-              name="endDateTime"
-              value={formData.endDateTime}
-              onChange={handleChange}
-              required
-              style={{
-                padding: "15px",
-                borderRadius: "5px",
-                border: "1px solid #ccc",
-              }}
-            />
-
-            <textarea
-              name="message"
-              placeholder="Write your message"
-              rows="4"
-              value={formData.message}
-              onChange={handleChange}
-              required
-              style={{
-                padding: "15px",
-                borderRadius: "5px",
-                border: "1px solid #ccc",
-              }}
-            />
-
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                padding: "12px",
-                background: loading
-                  ? "gray"
-                  : "linear-gradient(90deg, #cc4334, #dc45bb)",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                fontWeight: "bold",
-                cursor: loading ? "not-allowed" : "pointer",
-                transition: "transform 0.2s",
-              }}
-              onMouseOver={(e) =>
-                !loading && (e.currentTarget.style.transform = "scale(1.05)")
-              }
-              onMouseOut={(e) =>
-                (e.currentTarget.style.transform = "scale(1)")
-              }
-            >
-              {loading ? "Submitting..." : "Submit"}
-            </button>
-          </form>
-        </div>
-
-        {/* Google Map */}
-        <div
-          style={{
-            flex: "1 1 400px",
-            minWidth: "300px",
-            maxWidth: "600px",
-            borderRadius: "12px",
-            overflow: "hidden",
-            boxShadow: "0px 4px 15px rgba(0,0,0,0.2)",
-          }}
-        >
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3892.7261555812393!2d80.1884081!3d13.1012479!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5263f3bff3a9db%3A0xd4ea3840d363ce02!2sThirumal%20Thirumagal%20Vasantha%20Mahal!5e0!3m2!1sen!2sin!4v1727000000000!5m2!1sen!2sin"
-            style={{ border: 0, width: "100%", height: "100%" }}
-            allowFullScreen=""
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          ></iframe>
-        </div>
-      </div>
-
-      {/* Dialog Box */}
+      {/* ✅ Dialog Box */}
       {dialog.open && (
-        <div
-          style={{
+        <Box
+          sx={{
             position: "fixed",
             top: 0,
             left: 0,
             width: "100%",
             height: "100%",
-            backgroundColor: "rgba(0,0,0,0.5)",
+            bgcolor: "rgba(0,0,0,0.5)",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
             zIndex: 9999,
           }}
         >
-          <div
-            style={{
-              background: "white",
-              padding: "20px 30px",
-              borderRadius: "10px",
+          <Paper
+            elevation={8}
+            sx={{
+              p: 4,
+              borderRadius: 3,
               textAlign: "center",
-              maxWidth: "400px",
-              boxShadow: "0px 4px 15px rgba(0,0,0,0.3)",
+              maxWidth: 400,
             }}
           >
-            <h3
-              style={{
-                color: dialog.success ? "green" : "red",
-                marginBottom: "10px",
-              }}
+            <Typography
+              variant="h6"
+              fontWeight="bold"
+              color={dialog.success ? "green" : "error"}
+              gutterBottom
             >
               {dialog.success ? "Success" : "Error"}
-            </h3>
-            <p>{dialog.message}</p>
-            <button
+            </Typography>
+            <Typography>{dialog.message}</Typography>
+            <Button
+              variant="contained"
               onClick={() => setDialog({ ...dialog, open: false })}
-              style={{
-                marginTop: "15px",
-                padding: "10px 20px",
-                border: "none",
-                borderRadius: "6px",
+              sx={{
+                mt: 3,
                 background: "linear-gradient(90deg, #cc4334, #dc45bb)",
-                color: "white",
-                fontWeight: "bold",
-                cursor: "pointer",
               }}
             >
               OK
-            </button>
-          </div>
-        </div>
+            </Button>
+          </Paper>
+        </Box>
       )}
-    </div>
+      
+    </Box>
+    {/* ✅ Map on top */}
+         <Box sx={{ textAlign: "center", py: 6 }}>
+      {/* Heading */}
+      <Typography variant="h4" fontWeight="bold" mb={3} color="primary">
+        Location
+      </Typography>
+
+      {/* Contact Row */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          gap: { xs: 2, md: 4 },
+          mb: 3,
+          flexWrap: "wrap",
+        }}
+      >
+        {/* Phone */}
+        <Box sx={{ textAlign: "center" }}>
+          <IconButton
+            color="primary"
+            onClick={() => (window.location.href = "tel:+919444048899")}
+          >
+            <PhoneIcons fontSize="large" />
+          </IconButton>
+          <Typography component="a" href="tel:+919444048899" sx={{ textDecoration: "none", color: "inherit" }}>
+            +91 94440 48899
+          </Typography>
+        </Box>
+
+        {/* WhatsApp */}
+        <Box sx={{ textAlign: "center" }}>
+          <IconButton
+            color="success"
+            onClick={() =>
+              window.open("https://wa.me/919444048899", "_blank")
+            }
+          >
+            <WhatsAppIcon fontSize="large" />
+          </IconButton>
+          <Typography
+            component="a"
+            href="https://wa.me/919444048899"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ textDecoration: "none", color: "inherit" }}
+          >
+            Chat on WhatsApp
+          </Typography>
+        </Box>
+
+        {/* Email */}
+        <Box sx={{ textAlign: "center" }}>
+          <IconButton
+            color="error"
+            onClick={() =>
+              (window.location.href = "mailto:info@yourmahal.com")
+            }
+          >
+            <EmailIcon fontSize="large" />
+          </IconButton>
+          <Typography
+            component="a"
+            href="mailto:info@yourmahal.com"
+            sx={{ textDecoration: "none", color: "inherit" }}
+          >
+            info@yourmahal.com
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* Google Map */}
+      <Paper
+        elevation={6}
+        sx={{
+          mx: { xs: 2, md: 8 },
+          borderRadius: 3,
+          overflow: "hidden",
+        }}
+      >
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3892.7261555812393!2d80.1884081!3d13.1012479!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5263f3bff3a9db%3A0xd4ea3840d363ce02!2sThirumal%20Thirumagal%20Vasantha%20Mahal!5e0!3m2!1sen!2sin!4v1727000000000!5m2!1sen!2sin"
+          style={{ border: 0, width: "100%", height: "450px" }}
+          allowFullScreen=""
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        ></iframe>
+      </Paper>
+    </Box>
+<FAQSection/>
+        
+        </>
+    
   );
 }

@@ -2,6 +2,7 @@
 'use client';
 import { Collections, EventAvailable } from '@mui/icons-material';
 import { Box, Container, Typography, Button, keyframes } from '@mui/material';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 // Keyframe animations
@@ -347,10 +348,12 @@ export default function HomePage() {
             transform: mounted ? 'translateY(0)' : 'translateY(30px)',
             transition: 'all 0.8s ease-out 0.8s',
           }}>
+            <Link href="/calender">
             <Button 
               variant="contained" 
               size="large"
               startIcon={<EventAvailable />}
+              
               className={mounted ? 'animate-on-scroll' : ''}
               sx={{
                 background: 'linear-gradient(135deg, #FF8C00 0%, #FF6348 50%, #FF4757 100%)',
@@ -395,8 +398,9 @@ export default function HomePage() {
               }}
             >
               <span style={{ position: 'relative', zIndex: 1 }}>Book Your Dream Event</span>
-            </Button>
+            </Button></Link>
             
+            <Link href="/gallery">
             <Button 
               variant="outlined" 
               size="large"
@@ -450,6 +454,7 @@ export default function HomePage() {
             >
               Explore Gallery
             </Button>
+            </Link>
           </Box>
           
           {/* Scroll indicator */}
