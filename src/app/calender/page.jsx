@@ -25,6 +25,8 @@ import {
   Alert,
   Popover,
   CircularProgress,
+  DialogContentText,
+  
 } from "@mui/material";
 import {
   ChevronLeft,
@@ -40,6 +42,11 @@ import Footer from "@/Components/Footer";
 
 const YearMonthCalendar = () => {
   const theme = useTheme();
+   const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const [snackbar, setSnackbar] = useState({
@@ -69,7 +76,7 @@ const YearMonthCalendar = () => {
   ];
 
   const url =
-    "https://script.google.com/macros/s/AKfycbxPLz0e3VWqHdBqSRkszQxAAcwWNdJd5H-tPCZ1-ZjrPtQZthqyarIvnK2WNbFPwP-lzg/exec%22";
+    "https://script.google.com/macros/s/AKfycbxqC-hbywANtJLLnuyrTlCKsSskbETAjPyBDk1OBuEDkNiDQaEYWwU3waz9eC7TGvdrTg/exec";
 
   const today = new Date();
   const [Events, setEvents] = useState([]);
@@ -100,6 +107,29 @@ const YearMonthCalendar = () => {
     }
   };
 
+  function normalizeDate(isoDate, format = "YYYY-MM-DD") {
+    const date = new Date(isoDate);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    if (format === "YYYY-MM-DD") {
+      return `${year}-${month}-${day}`;
+    }
+
+    if (format === "DD/MM/YYYY") {
+      return `${day}/${month}/${year}`;
+    }
+
+    if (format === "MM-DD-YYYY") {
+      return `${month}-${day}-${year}`;
+    }
+
+    // fallback → Local string
+    return date.toLocaleString();
+  }
+
   useEffect(() => {
     const fetchEvents = async () => {
       setLoading(true); // ✅ show loader before fetch
@@ -113,21 +143,30 @@ const YearMonthCalendar = () => {
 
         if (data.status === "success") {
           const normalized = data.data.map((event) => {
-            return {
-              title: event.title || event.Title || "",
-              startDate:
-                event.startDate ||
-                event["Event Start Date"] ||
-                event.date ||
-                event.Date,
-              endDate: event.endDate || event["Event End Date"] || "",
-              startTime: normalizeTime(
-                event.startTime || event["Event Start Time"]
-              ),
-              endTime: normalizeTime(event.endTime || event["Event End Time"]),
-              mahal: event.mahal || event.Mahal || "",
-            };
-          });
+  let MahalName = event.mahal || event.Mahal || "";
+  let mahalCode = "";
+
+  if (MahalName.includes("Thirumal")) {
+    mahalCode = "TTV";
+  } else if (MahalName.includes("Meenakshi")) {
+    mahalCode = "SMSH";
+  } else if (MahalName.toLowerCase().includes("both")) {
+    mahalCode = "BOTH"; // if you allow both halls at once
+  }
+
+  return {
+    id: event.ID,
+    title: event.title || event.Title || "",
+    startDate: normalizeDate(event.startDate || event.StartDate),
+    endDate: normalizeDate(event.EndDate || event.EndDate || ""),
+    startTime: normalizeTime(event.StartTime || ""),
+    endTime: normalizeTime(event.EndTime || ""),
+    mahal: mahalCode,
+  };
+});
+
+          console.log("bbb :",customEvents.length)
+          console.log("kkkk :",normalized)
           setCustomEvents(normalized);
         } else {
           console.error("Error:", data.message);
@@ -196,7 +235,7 @@ const YearMonthCalendar = () => {
   const events = useMemo(() => {
     // Filter custom events for the current month and year
     const filteredCustomEvents = customEvents.filter((event) => {
-      console.log("event:", event);
+      // console.log("event:", event);
 
       const eventDate = new Date(
         event.date || event.Date || event.startDate || event.StartDate
@@ -252,8 +291,9 @@ const YearMonthCalendar = () => {
   };
 
   const handleAddEvent = async () => {
+    setLoading(true)
     const data = {
-      id: Date.now().toString(), // 👈 unique event id
+      id: `Event_${Date.now()}`,
       title: newEventTitle,
       date: newEventStartDate || newEventEndDate, // Keep for backward compatibility
       startDate: newEventStartDate,
@@ -278,6 +318,7 @@ const YearMonthCalendar = () => {
       const result = await res.json();
       if (result.status === "success") {
         setCustomEvents(result.data);
+        setLoading(false)
       }
 
       showSnackbar("Event added successfully!", "success");
@@ -287,28 +328,39 @@ const YearMonthCalendar = () => {
     }
   };
 
-const handleDeleteEvent = async (eventId) => {
+  const [eventId,seteventId] = useState("")
+
+const handleDeleteEvent = async (id) => {
+  seteventId(id)
+  setOpen(true)
+};
+
+const handleConfirmDelete = async () => {
+  setLoading(true)
+  setOpen(false);
   try {
     const response = await fetch(url, {
-      method: "POST",  // use POST instead of DELETE
+      method: "POST",
+      mode:"no-cors",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "delete", id: eventId }),
     });
 
-    const result = await response.json();
-
-    if (result.status === "success") {
-      setCustomEvents((prev) => prev.filter((ev) => ev.id !== eventId));
-      showSnackbar("Event deleted successfully!", "success");
-    } else {
-      showSnackbar("Failed to delete event!", "error");
-    }
+      setTimeout(() => {
+        setCustomEvents((prev) => prev.filter((ev) => ev.id !== eventId));
+        showSnackbar("Event deleted successfully!", "success");
+        setLoading(false)
+      }, 1000);
+    
   } catch (err) {
     console.error("Delete error:", err);
     showSnackbar("Error deleting event!", "error");
   }
 };
- 
+
+
+
+
   const isDateInRange = (date, startDate, endDate, startTime, endTime) => {
     const d = new Date(date); // cell being checked (midnight)
     const start = new Date(startDate);
@@ -334,54 +386,49 @@ const handleDeleteEvent = async (eventId) => {
   };
 
   // Build calendar grid with only actual days
-  const calendarDays = useMemo(() => {
-    const days = [];
+ const calendarDays = useMemo(() => {
+  const days = [];
 
-    for (let d = 1; d <= daysInMonth; d++) {
-      const date = new Date(selectedYear, monthIndex, d);
-      const dayOfWeek = date.getDay();
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(selectedYear, monthIndex, d);
+    const dayOfWeek = date.getDay();
 
-      // 🔹 Instead of filtering by "exact date", check date ranges
-      const dayEvents = events.filter((event) => {
-        const { startDate, endDate, startTime, endTime } = event;
-        return isDateInRange(date, startDate, endDate, startTime, endTime);
-      });
+    // Collect all events for this day (with range check)
+    const dayEvents = events.filter((event) => {
+      return isDateInRange(date, event.startDate, event.endDate, event.startTime, event.endTime);
+    });
 
-      let topColor = "transparent";
-      let bottomColor = "transparent";
+    let topColor = "transparent";
+    let bottomColor = "transparent";
 
-      if (dayEvents.length > 0) {
-        const hasTTV = dayEvents.some(
-          (event) => (event.mahal || event.Mahal) === "TTV"
-        );
-        const hasSMSH = dayEvents.some(
-          (event) => (event.mahal || event.Mahal) === "SMSH"
-        );
+    if (dayEvents.length > 0) {
+      const hasTTV = dayEvents.some((event) => event.mahal === "TTV" || event.mahal === "BOTH");
+      const hasSMSH = dayEvents.some((event) => event.mahal === "SMSH" || event.mahal === "BOTH");
 
-        if (hasTTV && hasSMSH) {
-          // Both booked
-          topColor = "#ff4444"; // Red
-          bottomColor = "#44ff44"; // Green
-        } else if (hasTTV) {
-          topColor = "#ff4444";
-          bottomColor = "#ff4444"; // 🔥 fill full cell
-        } else if (hasSMSH) {
-          topColor = "#44ff44";
-          bottomColor = "#44ff44"; // 🔥 fill full cell
-        }
+      if (hasTTV && hasSMSH) {
+        // BOTH halls booked → FULL green
+        topColor = "#44ff44";
+        bottomColor = "#44ff44";
+      } else if (hasTTV) {
+        topColor = "#44ff44";
+        bottomColor = "#44ff44";
+      } else if (hasSMSH) {
+        topColor = "#44ff44";
+        bottomColor = "#44ff44";
       }
-
-      days.push({
-        day: d,
-        dayOfWeek,
-        events: dayEvents,
-        topColor,
-        bottomColor,
-      });
     }
 
-    return days;
-  }, [selectedYear, selectedMonth, events, daysInMonth, monthIndex]);
+    days.push({
+      day: d,
+      dayOfWeek,
+      events: dayEvents,
+      topColor,
+      bottomColor,
+    });
+  }
+
+  return days;
+}, [selectedYear, selectedMonth, events, daysInMonth, monthIndex]);
 
   // Separate calendar data for each Mahal
   // TTV Calendar (only TTV events)
@@ -415,6 +462,8 @@ const handleDeleteEvent = async (eventId) => {
   // Weekday headers
   const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+
+  
   return (
     <>
       <Box
@@ -885,34 +934,38 @@ const handleDeleteEvent = async (eventId) => {
                           </Box>
 
                           {/* Events indicator dot */}
-                          {dayData.events.length > 0 && (
-                            <Box
-                              sx={{
-                                position: "absolute",
-                                bottom: 4,
-                                right: 4,
-                                zIndex: 2,
-                                display: "flex",
-                                gap: 0.5,
-                              }}
-                            >
-                              {dayData.events.map((event, idx) => (
-                                <Box
-                                  key={idx}
-                                  sx={{
-                                    width: 6,
-                                    height: 6,
-                                    borderRadius: "50%",
-                                    backgroundColor:
-                                      (event.mahal || event.Mahal) === "TTV"
-                                        ? "#ff4444ff"
-                                        : "#ff4444ff",
-                                    border: "1px solid black",
-                                  }}
-                                />
-                              ))}
-                            </Box>
-                          )}
+                          {/* Events indicator dots (count) */}
+{dayData.events.length > 0 && (
+  <Box
+    sx={{
+      position: "absolute",
+      bottom: 4,
+      right: 4,
+      zIndex: 2,
+      display: "flex",
+      gap: 0.5,
+    }}
+  >
+    {dayData.events.map((event, idx) => (
+      <Box
+        key={idx}
+        sx={{
+          width: 6,
+          height: 6,
+          borderRadius: "50%",
+          backgroundColor:
+            event.mahal === "TTV"
+              ? "#ff4444"
+              : event.mahal === "SMSH"
+              ? "#ff4444"
+              : "#aa00ff", // both halls in purple
+          border: "1px solid black",
+        }}
+      />
+    ))}
+  </Box>
+)}
+
                         </Paper>
                       </Grid>
                     );
@@ -1279,34 +1332,38 @@ const handleDeleteEvent = async (eventId) => {
                           </Box>
 
                           {/* Events indicator dot */}
-                          {dayData.events.length > 0 && (
-                            <Box
-                              sx={{
-                                position: "absolute",
-                                bottom: 4,
-                                right: 4,
-                                zIndex: 2,
-                                display: "flex",
-                                gap: 0.5,
-                              }}
-                            >
-                              {dayData.events.map((event, idx) => (
-                                <Box
-                                  key={idx}
-                                  sx={{
-                                    width: 6,
-                                    height: 6,
-                                    borderRadius: "50%",
-                                    backgroundColor:
-                                      (event.mahal || event.Mahal) === "SMSH"
-                                        ? "#ff4444ff"
-                                        : "#ff0a0aff",
-                                    border: "1px solid black",
-                                  }}
-                                />
-                              ))}
-                            </Box>
-                          )}
+                          {/* Events indicator dots (count) */}
+{dayData.events.length > 0 && (
+  <Box
+    sx={{
+      position: "absolute",
+      bottom: 4,
+      right: 4,
+      zIndex: 2,
+      display: "flex",
+      gap: 0.5,
+    }}
+  >
+    {dayData.events.map((event, idx) => (
+      <Box
+        key={idx}
+        sx={{
+          width: 6,
+          height: 6,
+          borderRadius: "50%",
+          backgroundColor:
+            event.mahal === "TTV"
+              ? "#ff4444"
+              : event.mahal === "SMSH"
+              ? "#ff4444"
+              : "#aa00ff", // both halls in purple
+          border: "1px solid black",
+        }}
+      />
+    ))}
+  </Box>
+)}
+
                         </Paper>
                       </Grid>
                     );
@@ -1593,73 +1650,8 @@ const handleDeleteEvent = async (eventId) => {
               </TextField>
             </Box>
 
-            {/* List of custom events for the selected month */}
-            {customEvents.filter((event) => {
-              const eventDate = new Date(
-                event.date || event.Date || event.startDate || event.StartDate
-              );
-              return (
-                eventDate.getFullYear() === selectedYear &&
-                eventDate.getMonth() === months.indexOf(selectedMonth)
-              );
-            }).length > 0 && (
-              <Box sx={{ mt: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                  Your Events for {selectedMonth} {selectedYear}
-                </Typography>
-                <List>
-                  {customEvents
-                    .filter((event) => {
-                      const eventDate = new Date(
-                        event.date ||
-                          event.Date ||
-                          event.startDate ||
-                          event.StartDate
-                      );
-                      return (
-                        eventDate.getFullYear() === selectedYear &&
-                        eventDate.getMonth() === months.indexOf(selectedMonth)
-                      );
-                    })
-                    .map((event) => (
-                      <ListItem key={event.id}>
-                        <ListItemText
-                          primary={event.Title || event.title}
-                          secondary={
-                            <Box>
-                              <Typography variant="body2">
-                                Start:{" "}
-                                {formatDateTime(
-                                  event.startDate || event.date || event.Date,
-                                  event.startTime
-                                )}
-                              </Typography>
-                              {event.endDate && (
-                                <Typography variant="body2">
-                                  End:{" "}
-                                  {formatDateTime(event.endDate, event.endTime)}
-                                </Typography>
-                              )}
-                              <Typography variant="body2">
-                                Mahal: {event.mahal || event.Mahal}
-                              </Typography>
-                            </Box>
-                          }
-                        />
-                        <ListItemSecondaryAction>
-                          <IconButton
-                            edge="end"
-                            aria-label="delete"
-                            onClick={() => handleDeleteEvent(event.id)}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </ListItemSecondaryAction>
-                      </ListItem>
-                    ))}
-                </List>
-              </Box>
-            )}
+       
+
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseModal}>Cancel</Button>
@@ -1668,17 +1660,68 @@ const handleDeleteEvent = async (eventId) => {
               variant="contained"
               disabled={!newEventStartDate || !newEventTitle}
             >
-              Add Event
+              {loading === true ? "loading...":"Add Event"}
             </Button>
+            
           </DialogActions>
+
+               {/* List of custom events for the selected month */}
+<DialogContent>
+             {customEvents?.length > 0 && (
+  customEvents?.map((e) => (
+    <Box
+      key={e.id}
+      sx={{
+        border: "1px solid #e0e0e0",
+        borderRadius: 2,
+        p: 2,
+        mb: 2,
+        boxShadow: 1,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
+    >
+      {/* Event details */}
+      <Box>
+        <Typography variant="h6" fontWeight="bold">
+          {e.title || "Untitled Event"}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          🕌 Mahal: {e?.mahal || "-"}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          📅 Start: {e.startDate}
+        </Typography>
+        {e.endDate && (
+          <Typography variant="body2" color="text.secondary">
+            ⏳ End: {e.endDate}
+          </Typography>
+        )}
+      </Box>
+
+      {/* Delete button */}
+      <Button
+        variant="contained"
+        color="error"
+        onClick={() => handleDeleteEvent(e.id)}
+        sx={{ ml: 2 }}
+      >
+        {loading === true ? "loading...":"Delete"}
+      </Button>
+    </Box>
+  ))
+)}
+</DialogContent>
         </Dialog>
+        
 
         {/* Snackbar for notifications */}
         <Snackbar
           open={snackbar.open}
           autoHideDuration={6000}
           onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
         >
           <Alert
             onClose={handleCloseSnackbar}
@@ -1713,6 +1756,27 @@ const handleDeleteEvent = async (eventId) => {
         </Box>
       </Link>
       <Footer handleOpenModal={handleOpenModal}/>
+            <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
+      >
+        <DialogTitle id="delete-dialog-title">Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="delete-dialog-description">
+            Are you sure you want to delete this event date.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} color="error" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
