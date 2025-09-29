@@ -69,7 +69,7 @@ const YearMonthCalendar = () => {
   ];
 
   const url =
-    "https://script.google.com/macros/s/AKfycbwmeOK6aUTxUwwrfz4iWHfsmmxOic8t71XYJR85CTwjUePvpieoEFahKsgrO0iUVDCH/exec";
+    "https://script.google.com/macros/s/AKfycbxPLz0e3VWqHdBqSRkszQxAAcwWNdJd5H-tPCZ1-ZjrPtQZthqyarIvnK2WNbFPwP-lzg/exec%22";
 
   const today = new Date();
   const [Events, setEvents] = useState([]);
@@ -109,7 +109,7 @@ const YearMonthCalendar = () => {
         });
 
         const data = await res.json();
-        console.log("data:", data);
+        console.log("date:", data);
 
         if (data.status === "success") {
           const normalized = data.data.map((event) => {
@@ -308,8 +308,7 @@ const handleDeleteEvent = async (eventId) => {
     showSnackbar("Error deleting event!", "error");
   }
 };
-
-
+ 
   const isDateInRange = (date, startDate, endDate, startTime, endTime) => {
     const d = new Date(date); // cell being checked (midnight)
     const start = new Date(startDate);
