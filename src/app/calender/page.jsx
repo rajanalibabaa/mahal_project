@@ -76,7 +76,7 @@ const YearMonthCalendar = () => {
   ];
 
   const url =
-    "https://script.google.com/macros/s/AKfycbxqC-hbywANtJLLnuyrTlCKsSskbETAjPyBDk1OBuEDkNiDQaEYWwU3waz9eC7TGvdrTg/exec";
+    "https://script.google.com/macros/s/AKfycbwJ1gVDM9bjEOqa3l1Yh71ybR7MqTZEhP8zPu12H_Cf72Sv_fyCW4I1rfXch9WdB2iosA/exec";
 
   const today = new Date();
   const [Events, setEvents] = useState([]);
@@ -91,6 +91,10 @@ const YearMonthCalendar = () => {
   const [customEvents, setCustomEvents] = useState([]);
   const [dropdownValue, setDropdownValue] = useState("TTV");
   const [loading, setLoading] = useState(true);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [name, setName] = useState("");
+  const [ph, setPh] = useState("");
+
 
   const normalizeTime = (value) => {
     if (!value) return "";
@@ -162,11 +166,12 @@ const YearMonthCalendar = () => {
     startTime: normalizeTime(event.StartTime || ""),
     endTime: normalizeTime(event.EndTime || ""),
     mahal: mahalCode,
+    customer: event.CustomerName,
+    phNumber: event.MobileNumbe,
   };
 });
 
-          console.log("bbb :",customEvents.length)
-          console.log("kkkk :",normalized)
+          // console.log("kkkk :",normalized)
           setCustomEvents(normalized);
         } else {
           console.error("Error:", data.message);
@@ -301,6 +306,8 @@ const YearMonthCalendar = () => {
       endDate: newEventEndDate,
       endTime: newEventEndTime,
       mahal: dropdownValue,
+      name: name,
+      ph:ph
     };
     console.log("data:", data);
     try {
@@ -336,8 +343,8 @@ const handleDeleteEvent = async (id) => {
 };
 
 const handleConfirmDelete = async () => {
-  setLoading(true)
-  setOpen(false);
+  setDeleteLoading(true)
+  
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -349,7 +356,8 @@ const handleConfirmDelete = async () => {
       setTimeout(() => {
         setCustomEvents((prev) => prev.filter((ev) => ev.id !== eventId));
         showSnackbar("Event deleted successfully!", "success");
-        setLoading(false)
+        setDeleteLoading(false)
+        setOpen(false);
       }, 1000);
     
   } catch (err) {
@@ -645,7 +653,7 @@ const handleConfirmDelete = async () => {
                       "&:hover": { backgroundColor: "secondary.dark" },
                     }}
                   >
-                    {isMobile ? "Add" : "Add Event"}
+                    {isMobile ? "Add" : "Add  "}
                   </Button> */}
                 </Box>
               </Box>
@@ -1543,178 +1551,178 @@ const handleConfirmDelete = async () => {
 
 
         {/* Add Event Modal */}
-        <Dialog
-          open={openModal}
-          onClose={handleCloseModal}
-          maxWidth="sm"
-          fullWidth
+     <Dialog open={openModal} onClose={handleCloseModal} maxWidth="sm" fullWidth>
+      <DialogTitle>Add New Event</DialogTitle>
+
+      {/* Form Section */}
+      <DialogContent>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
+          {/* Start Date + Time */}
+          <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+            <TextField
+              label="Event Start Date"
+              type="date"
+              value={newEventStartDate}
+              onChange={(e) => setNewEventStartDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              fullWidth
+            />
+            <TextField
+              label="Start Time"
+              type="time"
+              value={newEventStartTime}
+              onChange={(e) => setNewEventStartTime(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              fullWidth
+            />
+          </Box>
+
+          {/* End Date + Time */}
+          <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+            <TextField
+              label="Event End Date"
+              type="date"
+              value={newEventEndDate}
+              onChange={(e) => setNewEventEndDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              fullWidth
+            />
+            <TextField
+              label="End Time"
+              type="time"
+              value={newEventEndTime}
+              onChange={(e) => setNewEventEndTime(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              fullWidth
+            />
+          </Box>
+
+          {/* Name + Phone */}
+          <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+            <TextField
+              label="Enter Full Name"
+              type="text"
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              fullWidth
+            />
+            <TextField
+              label="Enter Phone Number"
+              type="text"
+              placeholder="Enter your phone number"
+              value={ph}
+              onChange={(e) => setPh(e.target.value)}
+              fullWidth
+            />
+          </Box>
+
+          {/* Event Title */}
+          <TextField
+            select
+            label="Event Title"
+            value={newEventTitle}
+            onChange={(e) => setNewEventTitle(e.target.value)}
+            fullWidth
+          >
+            <MenuItem value="Marriage">Marriage</MenuItem>
+            <MenuItem value="Reception">Reception</MenuItem>
+            <MenuItem value="Engagement">Engagement</MenuItem>
+            <MenuItem value="WeddingAnniversary">Wedding Anniversary</MenuItem>
+            <MenuItem value="Seemantham/Valaikappu">Seemantham / Valaikappu</MenuItem>
+            <MenuItem value="Poonool/Upanayanam">Poonool / Upanayanam</MenuItem>
+            <MenuItem value="Sangeet & Mehandi">Sangeet & Mehandi</MenuItem>
+            <MenuItem value="BirthDay">Birthday</MenuItem>
+            <MenuItem value="Puberty">Puberty</MenuItem>
+            <MenuItem value="Others">Others</MenuItem>
+          </TextField>
+
+          {/* Mahal Dropdown */}
+          <TextField
+            select
+            label="Select Mahal"
+            value={dropdownValue}
+            onChange={(e) => setDropdownValue(e.target.value)}
+            fullWidth
+          >
+            <MenuItem value="Thirumal Thirumagal Vasanth Mahal A/C">
+              Thirumal Thirumagal Vasanth Mahal A/C
+            </MenuItem>
+            <MenuItem value="Shri Meenakshi Sundarar Hall A/C">
+              Shri Meenakshi Sundarar Hall A/C
+            </MenuItem>
+          </TextField>
+        </Box>
+      </DialogContent>
+
+      {/* Actions */}
+      <DialogActions>
+        <Button onClick={handleCloseModal}>Cancel</Button>
+        <Button
+          onClick={handleAddEvent}
+          variant="contained"
+          disabled={!newEventStartDate || !newEventTitle}
         >
-          <DialogTitle>Add New Event</DialogTitle>
-          <DialogContent>
+          {loading ? "Loading..." : "Add Event"}
+        </Button>
+      </DialogActions>
+
+      {/* Event List */}
+      {customEvents?.length > 0 && (
+        <DialogContent>
+          {customEvents.map((e) => (
             <Box
-              sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}
+              key={e.id}
+              sx={{
+                border: "1px solid #e0e0e0",
+                borderRadius: 2,
+                p: 2,
+                mb: 2,
+                boxShadow: 1,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
             >
-              {/* Start Date and Time */}
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 2,
-                  flexDirection: { xs: "column", sm: "row" },
-                }}
-              >
-                <TextField
-                  label="Event Start Date"
-                  type="date"
-                  value={newEventStartDate}
-                  onChange={(e) => setNewEventStartDate(e.target.value)}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  fullWidth
-                />
-                <TextField
-                  label="Start Time"
-                  type="time"
-                  value={newEventStartTime}
-                  onChange={(e) => setNewEventStartTime(e.target.value)}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  fullWidth
-                />
+              {/* Event details */}
+              <Box>
+                <Typography variant="h6" fontWeight="bold">
+                  {e.title || "Untitled Event"}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  🕌 Mahal: {e?.mahal || "-"}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Customer Name: {e?.customer || "-"}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  mobileNumber: {e?.phNumber || "-"}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  📅 Start: {e.startDate}
+                </Typography>
+                {e.endDate && (
+                  <Typography variant="body2" color="text.secondary">
+                    ⏳ End: {e.endDate}
+                  </Typography>
+                )}
               </Box>
 
-              {/* End Date and Time */}
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 2,
-                  flexDirection: { xs: "column", sm: "row" },
-                }}
+              {/* Delete button */}
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => handleDeleteEvent(e.id)}
+                sx={{ ml: 2 }}
               >
-                <TextField
-                  label="Event End Date"
-                  type="date"
-                  value={newEventEndDate}
-                  onChange={(e) => setNewEventEndDate(e.target.value)}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  fullWidth
-                />
-                <TextField
-                  label="End Time"
-                  type="time"
-                  value={newEventEndTime}
-                  onChange={(e) => setNewEventEndTime(e.target.value)}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  fullWidth
-                />
-              </Box>
-
-              <TextField
-                select
-                label="Event Title"
-                value={newEventTitle}
-                onChange={(e) => setNewEventTitle(e.target.value)}
-                fullWidth
-              >
-                <MenuItem value="Marriage">Marriage</MenuItem>
-                <MenuItem value="Reception">Reception</MenuItem>
-                <MenuItem value="Engagement">Engagement</MenuItem>
-                <MenuItem value="WeddingAnniversary">
-                  WeddingAnniversary
-                </MenuItem>
-                <MenuItem value="Seemantham/Valaikappu">
-                  Seemantham/Valaikappu
-                </MenuItem>
-                <MenuItem value="Poonool/Upanayanam">
-                  Poonool/Upanayanam
-                </MenuItem>
-                <MenuItem value="Sangeet & Mehandi">Sangeet & Mehandi</MenuItem>
-                <MenuItem value="BirthDay">BirthDay</MenuItem>
-                <MenuItem value="Puberty">Puberty</MenuItem>
-                <MenuItem value="Others">Others</MenuItem>
-              </TextField>
-              <TextField
-                select
-                label="Select Option"
-                value={dropdownValue}
-                onChange={(e) => setDropdownValue(e.target.value)}
-                fullWidth
-              >
-                <MenuItem value="Thirumal Thirumagal Vasanth Mahal A/C">Thirumal Thirumagal Vasanth Mahal A/C</MenuItem>
-                <MenuItem value="Shri Meenakshi Sundarar Hall A/C">Shri Meenakshi Sundarar Hall A/C</MenuItem>
-              </TextField>
+                {/* {deleteLoading ? "loading...":"Delete"} */}
+                Delete
+              </Button>
             </Box>
-
-       
-
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseModal}>Cancel</Button>
-            <Button
-              onClick={handleAddEvent}
-              variant="contained"
-              disabled={!newEventStartDate || !newEventTitle}
-            >
-              {loading === true ? "loading...":"Add Event"}
-            </Button>
-            
-          </DialogActions>
-
-               {/* List of custom events for the selected month */}
-<DialogContent>
-             {customEvents?.length > 0 && (
-  customEvents?.map((e) => (
-    <Box
-      key={e.id}
-      sx={{
-        border: "1px solid #e0e0e0",
-        borderRadius: 2,
-        p: 2,
-        mb: 2,
-        boxShadow: 1,
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
-    >
-      {/* Event details */}
-      <Box>
-        <Typography variant="h6" fontWeight="bold">
-          {e.title || "Untitled Event"}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          🕌 Mahal: {e?.mahal || "-"}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          📅 Start: {e.startDate}
-        </Typography>
-        {e.endDate && (
-          <Typography variant="body2" color="text.secondary">
-            ⏳ End: {e.endDate}
-          </Typography>
-        )}
-      </Box>
-
-      {/* Delete button */}
-      <Button
-        variant="contained"
-        color="error"
-        onClick={() => handleDeleteEvent(e.id)}
-        sx={{ ml: 2 }}
-      >
-        {loading === true ? "loading...":"Delete"}
-      </Button>
-    </Box>
-  ))
-)}
-</DialogContent>
-        </Dialog>
-        
+          ))}
+        </DialogContent>
+      )}
+    </Dialog>
 
         {/* Snackbar for notifications */}
         <Snackbar
@@ -1773,7 +1781,7 @@ const handleConfirmDelete = async () => {
             Cancel
           </Button>
           <Button onClick={handleConfirmDelete} color="error" autoFocus>
-            Delete
+            {deleteLoading ? "loading...":"Delete"}
           </Button>
         </DialogActions>
       </Dialog>
