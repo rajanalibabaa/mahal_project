@@ -69,7 +69,7 @@ const YearMonthCalendar = () => {
   ];
 
   const url =
-    "https://script.google.com/macros/s/AKfycbwmeOK6aUTxUwwrfz4iWHfsmmxOic8t71XYJR85CTwjUePvpieoEFahKsgrO0iUVDCH/exec";
+    "https://script.google.com/macros/s/AKfycbwAoMfXvuWjfVgodxhkNSv_GaaT-TjSlorRLj-TJU5YakmK9t5QwnH81CFpK0rfvhq0QQ/exec";
 
   const today = new Date();
   const [Events, setEvents] = useState([]);
@@ -253,7 +253,7 @@ const YearMonthCalendar = () => {
 
   const handleAddEvent = async () => {
     const data = {
-      id: Date.now().toString(), // 👈 unique event id
+      id: `Event_${Date.now()}`,
       title: newEventTitle,
       date: newEventStartDate || newEventEndDate, // Keep for backward compatibility
       startDate: newEventStartDate,
