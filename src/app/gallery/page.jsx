@@ -13,6 +13,7 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import Footer from "@/Components/Footer";
 
 
 const Gallery = () => {
@@ -116,6 +117,7 @@ const Gallery = () => {
   };
 
   return (
+    <>
     <Box sx={{ flexGrow: 1, p: 2 ,mt:"5rem"}}>
       <Box sx={{ textAlign: "center", mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: "bold" }}>
@@ -246,7 +248,10 @@ const Gallery = () => {
           )}
         </DialogContent>
       </Dialog>
+      
     </Box>
+    <Footer/>
+    </>
   );
 };
 

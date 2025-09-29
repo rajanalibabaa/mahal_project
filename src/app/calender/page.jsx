@@ -36,6 +36,7 @@ import {
 import { useEffect } from "react";
 import Link from "next/link";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
+import Footer from "@/Components/Footer";
 
 const YearMonthCalendar = () => {
   const theme = useTheme();
@@ -1712,6 +1713,7 @@ const handleDeleteEvent = async (eventId) => {
           </Button>
         </Box>
       </Link>
+      <Footer handleOpenModal={handleOpenModal}/>
     </>
   );
 };
