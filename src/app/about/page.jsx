@@ -26,6 +26,7 @@ import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Link from "next/link";
 import EcoFriendly from "@/Components/EcoFriendly";
+import Footer from "@/Components/Footer";
 
 const MotionBox = motion(Box);
 const MotionCard = motion(Card);
@@ -396,6 +397,7 @@ export default function PricingSection() {
         
       </Container>
               <EcoFriendly/>
+                   <Footer/>
 
     </Box>
   );

@@ -1,5 +1,6 @@
 // app/page.js
 'use client';
+import Footer from '@/Components/Footer';
 import { Collections, EventAvailable } from '@mui/icons-material';
 import { Box, Container, Typography, Button, keyframes } from '@mui/material';
 import Link from 'next/link';
@@ -104,6 +105,7 @@ export default function HomePage() {
   }, []);
 
   return (
+    <>
     <Box>
       {/* Hero Section */}
       <Box
@@ -492,7 +494,12 @@ export default function HomePage() {
             }} />
           </Box>
         </Container>
+        
+       
       </Box>
+    
     </Box>
+         
+    </>
   );
 }

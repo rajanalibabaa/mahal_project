@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Container,
@@ -7,6 +7,11 @@ import {
   Typography,
   IconButton,
   Divider,
+  Modal,
+  TextField,
+  Button,
+  Paper,
+  Alert,
 } from "@mui/material";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
@@ -14,8 +19,20 @@ import YouTubeIcon from "@mui/icons-material/YouTube";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import { useRouter } from "next/navigation";
 
-export default function Footer() {
+export default function Footer({ handleOpenModal }) {
   const router = useRouter();
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [loginData, setLoginData] = useState({
+    username: "",
+    password: ""
+  });
+  const [error, setError] = useState("");
+
+  // Default credentials
+  const defaultCredentials = {
+    username: "admin",
+    password: "thirumal@123"
+  };
 
   // Unique heading style with underline slash
   const headingStyle = {
@@ -33,6 +50,59 @@ export default function Footer() {
       bgcolor: "secondary.main",
       borderRadius: "2px",
     },
+  };
+
+  // Modal style
+  const modalStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+    borderRadius: 2,
+  };
+
+  const handleLoginOpen = () => {
+    setLoginOpen(true);
+    setError("");
+    setLoginData({ username: "", password: "" });
+  };
+
+  const handleLoginClose = () => {
+    setLoginOpen(false);
+    setError("");
+    setLoginData({ username: "", password: "" });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setLoginData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleLoginSubmit = (e) => {
+    e.preventDefault();
+    
+    if (!loginData.username || !loginData.password) {
+      setError("Please enter both username and password");
+      return;
+    }
+
+    if (loginData.username === defaultCredentials.username && 
+        loginData.password === defaultCredentials.password) {
+      // Successful login - close login modal and open the booking modal
+      handleLoginClose();
+      if (handleOpenModal) {
+        handleOpenModal(); // Call the parent's modal opening function
+      }
+    } else {
+      setError("Invalid username or password");
+    }
   };
 
   return (
@@ -90,10 +160,11 @@ export default function Footer() {
           {/* Quick Links */}
           <Grid item xs={12} sm={6} md={3}>
             <Typography sx={headingStyle}>Quick Links</Typography>
+       
             <Typography
               variant="body2"
               sx={{ cursor: "pointer", mb: 1, "&:hover": { color: "secondary.light" } }}
-              onClick={() => router.push("/calender")}
+              onClick={handleLoginOpen}
             >
               Book Events
             </Typography>
@@ -178,9 +249,81 @@ export default function Footer() {
             </Typography>
           </Box>
           </Typography>
-          
         </Box>
       </Container>
+
+      {/* Login Modal */}
+      <Modal
+        open={loginOpen}
+        onClose={handleLoginClose}
+        aria-labelledby="login-modal-title"
+        aria-describedby="login-modal-description"
+      >
+        <Paper sx={modalStyle}>
+          <Typography id="login-modal-title" variant="h5" component="h2" gutterBottom align="center">
+            Login to Book Events
+          </Typography>
+          
+          <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
+            Enter your credentials to access event booking
+          </Typography>
+
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+
+          <Box component="form" onSubmit={handleLoginSubmit}>
+            <TextField
+              fullWidth
+              label="Username"
+              name="username"
+              value={loginData.username}
+              onChange={handleInputChange}
+              margin="normal"
+              required
+              autoFocus
+            />
+            <TextField
+              fullWidth
+              label="Password"
+              name="password"
+              type="password"
+              value={loginData.password}
+              onChange={handleInputChange}
+              margin="normal"
+              required
+            />
+            
+            <Box sx={{ mt: 3, display: "flex", gap: 2, justifyContent: "flex-end" }}>
+              <Button 
+                onClick={handleLoginClose}
+                variant="outlined"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit"
+                variant="contained"
+                sx={{
+                  backgroundColor: "primary.main",
+                  "&:hover": {
+                    backgroundColor: "primary.dark",
+                  },
+                }}
+              >
+                Login
+              </Button>
+            </Box>
+
+            {/* Demo credentials hint */}
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: "block" }}>
+              Demo: admin / thirumal@123
+            </Typography>
+          </Box>
+        </Paper>
+      </Modal>
     </Box>
   );
 }

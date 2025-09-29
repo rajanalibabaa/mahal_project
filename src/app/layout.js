@@ -72,7 +72,6 @@ export default function RootLayout({ children }) {
             <WhatsAppIcon sx={{ fontSize: 35 }} />
           </Box>
 
-          <Footer />
         </ThemeRegistry>
       </body>
     </html>

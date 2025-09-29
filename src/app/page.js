@@ -9,6 +9,7 @@ const StatsSection = dynamic(() => import("@/Components/StatusSection"));
 
 import HomePage from "./HomePage";
 import EcoFriendly from "@/Components/EcoFriendly";
+import Footer from "@/Components/Footer";
 
 export default function Page() {
   return (
@@ -19,6 +20,7 @@ export default function Page() {
 
       <StatsSection />
       <FAQSection />
+        <Footer/>
     </>
   );
 }

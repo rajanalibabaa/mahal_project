@@ -16,6 +16,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { FiberManualRecord } from "@mui/icons-material";
 import EcoFriendly from "@/Components/EcoFriendly";
+import Footer from "@/Components/Footer";
 
 // Facilities grouped by section
 const mainMahalFacilities = [
@@ -392,6 +393,7 @@ const FacilitiesGrid = ({ facilities }) => (
 
       {/* FAQ Section */}
       <FAQSection />
+      <Footer/>
     </>
   );
 }
