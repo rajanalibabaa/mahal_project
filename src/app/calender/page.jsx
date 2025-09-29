@@ -36,7 +36,7 @@ import {
 import { useEffect } from "react";
 import Link from "next/link";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
-import Footer from "@/Components/Footer";
+import axios from "axios";
 
 const YearMonthCalendar = () => {
   const theme = useTheme();
@@ -69,7 +69,7 @@ const YearMonthCalendar = () => {
   ];
 
   const url =
-    "https://script.google.com/macros/s/AKfycbwmeOK6aUTxUwwrfz4iWHfsmmxOic8t71XYJR85CTwjUePvpieoEFahKsgrO0iUVDCH/exec";
+    "https://script.google.com/macros/s/AKfycbwFvUatoX473y5G-LazhDuZUYOv7BtrukfihmTjEoM4gZNaWbIecIULlHmpkfhRd-9b/exec";
 
   const today = new Date();
   const [Events, setEvents] = useState([]);
@@ -84,63 +84,56 @@ const YearMonthCalendar = () => {
   const [customEvents, setCustomEvents] = useState([]);
   const [dropdownValue, setDropdownValue] = useState("TTV");
   const [loading, setLoading] = useState(true);
+const [newEventPersonName, setNewEventPersonName] = useState("");
+const [newEventMobileNumber, setNewEventMobileNumber] = useState("");
+// Update the normalizeTime function to handle the date format properly
+const normalizeTime = (value) => {
+  if (!value) return "";
+  try {
+    const d = new Date(value);
+    // Extract hours and minutes from the ISO string
+    const hours = d.getUTCHours();
+    const minutes = d.getUTCMinutes();
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  } catch {
+    return "";
+  }
+};
 
-  const normalizeTime = (value) => {
-    if (!value) return "";
+
+useEffect(() => {
+  const fetchEvents = async () => {
+    setLoading(true);
     try {
-      const d = new Date(value);
-      // check excel-style bogus date years
-      if (d.getFullYear() === 1899) {
-        return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      const res = await axios.get(`${url}?t=${Date.now()}`);
+      const data = res.data;   // axios auto-parses JSON
+
+      if (data.status === "success") {
+        const normalized = data.data.map((ev) => ({
+          id: ev.ID,
+          title: ev.Title,
+          startDate: ev["Start Date"],
+          endDate: ev["End Date"],
+          startTime: ev["Start Time"],
+          endTime: ev["End Time"],
+          mahal: ev.Mahal,
+          personName: ev["Person Name"] || "",
+          mobileNumber: ev["Mobile Number"] || "",
+        }));
+        setCustomEvents(normalized);
       }
-      // else return as normal
-      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    } catch {
-      return "";
+    } catch (err) {
+      console.error("Fetch error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      setLoading(true); // ✅ show loader before fetch
-      try {
-        const res = await fetch(`${url}?t=${Date.now()}`, {
-          cache: "no-store", // ✅ no caching, always fresh
-        });
+  fetchEvents();
+}, []);
 
-        const data = await res.json();
-        console.log("data:", data);
 
-        if (data.status === "success") {
-          const normalized = data.data.map((event) => {
-            return {
-              title: event.title || event.Title || "",
-              startDate:
-                event.startDate ||
-                event["Event Start Date"] ||
-                event.date ||
-                event.Date,
-              endDate: event.endDate || event["Event End Date"] || "",
-              startTime: normalizeTime(
-                event.startTime || event["Event Start Time"]
-              ),
-              endTime: normalizeTime(event.endTime || event["Event End Time"]),
-              mahal: event.mahal || event.Mahal || "",
-            };
-          });
-          setCustomEvents(normalized);
-        } else {
-          console.error("Error:", data.message);
-        }
-      } catch (err) {
-        console.error("Fetch error:", err);
-      } finally {
-        setLoading(false); // ✅ render calendar after data
-      }
-    };
 
-    fetchEvents();
-  }, []);
 
   const showSnackbar = (message, severity) => {
     setSnackbar({ open: true, message, severity });
@@ -164,33 +157,34 @@ const YearMonthCalendar = () => {
   };
 
   // Format date and time for display
-  const formatDateTime = (dateString, timeString = "") => {
-    if (!dateString) return "";
+// Update the formatDateTime function for the popover
+const formatDateTime = (dateString, timeString = "") => {
+  if (!dateString) return "";
 
-    try {
-      let date = new Date(dateString);
-
-      // If time is provided, set it properly
-      if (timeString) {
-        const [hours, minutes] = timeString.split(":");
-        date.setHours(parseInt(hours, 10), parseInt(minutes, 10));
-      }
-
-      // Format date & time in Indian Standard Time
-      return date.toLocaleString("en-IN", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-        timeZone: "Asia/Kolkata", // 👈 always Indian time
-      });
-    } catch (err) {
-      console.error("Invalid date/time:", dateString, timeString);
-      return "";
+  try {
+    let date = new Date(dateString);
+    
+    // Format date
+    const dateOptions = { 
+      year: "numeric", 
+      month: "short", 
+      day: "numeric",
+      timeZone: "Asia/Kolkata"
+    };
+    
+    let formattedDate = date.toLocaleDateString("en-IN", dateOptions);
+    
+    // Add time if provided
+    if (timeString && timeString !== "undefined:undefined") {
+      return `${formattedDate} at ${timeString}`;
     }
-  };
+    
+    return formattedDate;
+  } catch (err) {
+    console.error("Invalid date/time:", dateString, timeString);
+    return "";
+  }
+};
 
   // Sample events data combined with custom events
   const events = useMemo(() => {
@@ -251,57 +245,45 @@ const YearMonthCalendar = () => {
     setNewEventTitle("");
   };
 
-  const handleAddEvent = async () => {
-    const data = {
-      id: Date.now().toString(), // 👈 unique event id
-      title: newEventTitle,
-      date: newEventStartDate || newEventEndDate, // Keep for backward compatibility
-      startDate: newEventStartDate,
-      startTime: newEventStartTime,
-      endDate: newEventEndDate,
-      endTime: newEventEndTime,
-      mahal: dropdownValue,
-    };
-    console.log("data:", data);
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      handleCloseModal();
-      // Refresh events after adding
-      const res = await fetch(url);
-      const result = await res.json();
-      if (result.status === "success") {
-        setCustomEvents(result.data);
-      }
-
-      showSnackbar("Event added successfully!", "success");
-    } catch (error) {
-      console.error("Error sending event:", error);
-      showSnackbar("Error adding event!", "error");
-    }
+const handleAddEvent = async () => {
+  const payload = {
+    id: `event_${Date.now()}`,
+    title: newEventTitle,
+    startDate: newEventStartDate,
+    endDate: newEventEndDate || newEventStartDate,
+    startTime: newEventStartTime,
+    endTime: newEventEndTime || newEventStartTime,
+    mahal: dropdownValue,
+    personName: newEventPersonName,
+    mobileNumber: newEventMobileNumber,
   };
+
+  try {
+    const response = await axios.post(url, payload, {
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" }
+    });
+    console.log("Add result:", response.data);
+  } catch (err) {
+    console.error("Add error:", err);
+  }
+};
+
+
 
 const handleDeleteEvent = async (eventId) => {
   try {
-    const response = await fetch(url, {
-      method: "POST",  // use POST instead of DELETE
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "delete", id: eventId }),
-    });
+    const response = await axios.post(
+      url,
+      { action: "delete", id: eventId },
+      { headers: { "Content-Type": "application/json" } }
+    );
 
-    const result = await response.json();
-
-    if (result.status === "success") {
-      setCustomEvents((prev) => prev.filter((ev) => ev.id !== eventId));
+    if (response.data.status === "success") {
+      await fetchEvents();
       showSnackbar("Event deleted successfully!", "success");
     } else {
-      showSnackbar("Failed to delete event!", "error");
+      showSnackbar(response.data.message || "Failed to delete event!", "error");
     }
   } catch (err) {
     console.error("Delete error:", err);
@@ -310,29 +292,24 @@ const handleDeleteEvent = async (eventId) => {
 };
 
 
-  const isDateInRange = (date, startDate, endDate, startTime, endTime) => {
-    const d = new Date(date); // cell being checked (midnight)
-    const start = new Date(startDate);
-    const end = new Date(endDate || startDate);
 
-    // Apply times
-    if (startTime) {
-      const [sh, sm] = startTime.split(":");
-      start.setHours(parseInt(sh, 10), parseInt(sm, 10));
-    } else {
-      start.setHours(0, 0, 0, 0);
-    }
 
-    if (endTime) {
-      const [eh, em] = endTime.split(":");
-      end.setHours(parseInt(eh, 10), parseInt(em, 10));
-    } else {
-      end.setHours(23, 59, 59, 999);
-    }
-
-    // Check if the entire day overlaps
-    return d <= end && d >= start;
-  };
+const isDateInRange = (date, startDate, endDate, startTime, endTime) => {
+  const cellDate = new Date(date);
+  cellDate.setHours(0, 0, 0, 0);
+  
+  const start = new Date(startDate);
+  const end = endDate ? new Date(endDate) : new Date(startDate);
+  
+  // Reset to start of day for comparison
+  const startDay = new Date(start);
+  startDay.setHours(0, 0, 0, 0);
+  
+  const endDay = new Date(end);
+  endDay.setHours(23, 59, 59, 999);
+  
+  return cellDate >= startDay && cellDate <= endDay;
+};
 
   // Build calendar grid with only actual days
   const calendarDays = useMemo(() => {
@@ -386,32 +363,38 @@ const handleDeleteEvent = async (eventId) => {
 
   // Separate calendar data for each Mahal
   // TTV Calendar (only TTV events)
-  const ttvCalendarDays = calendarDays.map((day) => {
-    const ttvEvents = day.events.filter(
-      (event) => (event.mahal || event.Mahal) === "TTV"
-    );
+ const ttvCalendarDays = calendarDays.map((day) => {
+  const ttvEvents = day.events.filter(
+    (event) => {
+      const eventMahal = event.mahal || event.Mahal || "";
+      return eventMahal === "Thirumal Thirumagal Vasanth Mahal A/C" || eventMahal === "TTV";
+    }
+  );
 
-    return {
-      ...day,
-      events: ttvEvents,
-      topColor: ttvEvents.length > 0 ? "#44ff44" : "transparent", // 🟢 Green
-      bottomColor: "transparent",
-    };
-  });
+  return {
+    ...day,
+    events: ttvEvents,
+    topColor: ttvEvents.length > 0 ? "#44ff44" : "transparent",
+    bottomColor: "transparent",
+  };
+});
 
   // SSMH Calendar (only SSMH events)
   const ssmhCalendarDays = calendarDays.map((day) => {
-    const ssmhEvents = day.events.filter(
-      (event) => (event.mahal || event.Mahal) === "SMSH"
-    );
+  const ssmhEvents = day.events.filter(
+    (event) => {
+      const eventMahal = event.mahal || event.Mahal || "";
+      return eventMahal === "Shri Meenakshi Sundarar Hall A/C" || eventMahal === "SMSH";
+    }
+  );
 
-    return {
-      ...day,
-      events: ssmhEvents,
-      topColor: ssmhEvents.length > 0 ? "#44ff44" : "transparent", // 🟢 Green
-      bottomColor: "transparent",
-    };
-  });
+  return {
+    ...day,
+    events: ssmhEvents,
+    topColor: ssmhEvents.length > 0 ? "#44ff44" : "transparent",
+    bottomColor: "transparent",
+  };
+});
 
   // Weekday headers
   const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -716,120 +699,198 @@ const handleDeleteEvent = async (eventId) => {
                           }}
                         >
                           {/* Color indicators for TTV/SMSH */}
-                          {dayData.events.map((event, idx) => {
-                            const cellDate = new Date(
-                              selectedYear,
-                              monthIndex,
-                              dayData.day
-                            );
+{dayData.events.map((event, idx) => {
+  const cellDate = new Date(selectedYear, monthIndex, dayData.day);
+  cellDate.setHours(0, 0, 0, 0);
 
-                            const start = new Date(event.startDate);
-                            const end = new Date(
-                              event.endDate || event.startDate
-                            );
+  const start = new Date(event.startDate);
+  const end = event.endDate ? new Date(event.endDate) : new Date(event.startDate);
+  
+  // Reset times to compare dates only
+  const startDay = new Date(start);
+  startDay.setHours(0, 0, 0, 0);
+  
+  const endDay = new Date(end);
+  endDay.setHours(0, 0, 0, 0);
 
-                            // Parse hours/minutes safely
-                            const [sh, sm] = event.startTime
-                              ? event.startTime.split(":")
-                              : [0, 0];
-                            const [eh, em] = event.endTime
-                              ? event.endTime.split(":")
-                              : [23, 59];
+  const color = "#44ff44"; // Green for booked
 
-                            start.setHours(parseInt(sh, 10), parseInt(sm, 10));
-                            end.setHours(parseInt(eh, 10), parseInt(em, 10));
+  // Check if cell date is within the event date range
+  if (cellDate >= startDay && cellDate <= endDay) {
+    // Parse times from the normalized format
+    const startTime = event.startTime || "00:00";
+    const endTime = event.endTime || "23:59";
+    
+    const [sh, sm] = startTime.split(":");
+    const [eh, em] = endTime.split(":");
+    
+    const startHour = parseInt(sh, 10);
+    const endHour = parseInt(eh, 10);
 
-                            const color =
-                              (event.mahal || event.Mahal) === "TTV"
-                                ? "#44ff44"
-                                : "#44ff44";
+    // For same day events
+    if (startDay.getTime() === endDay.getTime() && cellDate.getTime() === startDay.getTime()) {
+      // Full day or spanning morning to evening
+      if ((startHour <= 6 && endHour >= 18) || (startTime === "00:00" && endTime === "23:59")) {
+        return (
+          <Box
+            key={idx}
+            sx={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              backgroundColor: color,
+              opacity: 0.9,
+            }}
+          />
+        );
+      }
+      // Morning only
+      else if (endHour <= 12) {
+        return (
+          <Box
+            key={idx}
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "50%",
+              backgroundColor: color,
+              opacity: 0.9,
+            }}
+          />
+        );
+      }
+      // Afternoon only
+      else if (startHour >= 12) {
+        return (
+          <Box
+            key={idx}
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "50%",
+              backgroundColor: color,
+              opacity: 0.9,
+            }}
+          />
+        );
+      }
+      // Default: full cell
+      else {
+        return (
+          <Box
+            key={idx}
+            sx={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              backgroundColor: color,
+              opacity: 0.9,
+            }}
+          />
+        );
+      }
+    }
+    // Multi-day events
+    else {
+      // First day of event
+      if (cellDate.getTime() === startDay.getTime()) {
+        if (startHour >= 12) {
+          return (
+            <Box
+              key={idx}
+              sx={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: "50%",
+                backgroundColor: color,
+                opacity: 0.9,
+              }}
+            />
+          );
+        } else {
+          return (
+            <Box
+              key={idx}
+              sx={{
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                backgroundColor: color,
+                opacity: 0.9,
+              }}
+            />
+          );
+        }
+      }
+      // Last day of event
+      else if (cellDate.getTime() === endDay.getTime()) {
+        if (endHour <= 12) {
+          return (
+            <Box
+              key={idx}
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: "50%",
+                backgroundColor: color,
+                opacity: 0.9,
+              }}
+            />
+          );
+        } else {
+          return (
+            <Box
+              key={idx}
+              sx={{
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                backgroundColor: color,
+                opacity: 0.9,
+              }}
+            />
+          );
+        }
+      }
+      // Middle days - full coverage
+      else {
+        return (
+          <Box
+            key={idx}
+            sx={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              backgroundColor: color,
+              opacity: 0.9,
+            }}
+          />
+        );
+      }
+    }
+  }
 
-                            // ========== CASES ==========
+  return null;
+})}
 
-                            // Case 1: Start date PM → fill bottom half of start day
-                            if (
-                              cellDate.toDateString() ===
-                                start.toDateString() &&
-                              start.getHours() >= 12
-                            ) {
-                              return (
-                                <Box
-                                  key={idx}
-                                  sx={{
-                                    position: "absolute",
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    height: "50%",
-                                    backgroundColor: color,
-                                    opacity: 0.9,
-                                  }}
-                                />
-                              );
-                            }
-
-                            // Case 2: End date AM → fill top half of end day
-                            if (
-                              cellDate.toDateString() === end.toDateString() &&
-                              end.getHours() <= 12
-                            ) {
-                              return (
-                                <Box
-                                  key={idx}
-                                  sx={{
-                                    position: "absolute",
-                                    top: 0,
-                                    left: 0,
-                                    right: 0,
-                                    height: "50%",
-                                    backgroundColor: color,
-                                    opacity: 0.9,
-                                  }}
-                                />
-                              );
-                            }
-
-                            // Case 3: Full days in between
-                            if (cellDate > start && cellDate < end) {
-                              return (
-                                <Box
-                                  key={idx}
-                                  sx={{
-                                    position: "absolute",
-                                    top: 0,
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    backgroundColor: color,
-                                    opacity: 0.9,
-                                  }}
-                                />
-                              );
-                            }
-
-                            // Case 4: Same‑day event (AM → PM)
-                            if (
-                              start.toDateString() === end.toDateString() &&
-                              cellDate.toDateString() === start.toDateString()
-                            ) {
-                              return (
-                                <Box
-                                  key={idx}
-                                  sx={{
-                                    position: "absolute",
-                                    top: 0,
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    backgroundColor: color,
-                                    opacity: 0.9,
-                                  }}
-                                />
-                              );
-                            }
-
-                            return null;
-                          })}
 
                           {/* Top Section (Day + Weekday) */}
                           <Box
@@ -1076,154 +1137,198 @@ const handleDeleteEvent = async (eventId) => {
                             overflow: "hidden",
                           }}
                         >
-                          {dayData.events.map((event, idx) => {
-                            const cellDate = new Date(
-                              selectedYear,
-                              monthIndex,
-                              dayData.day
-                            );
+{dayData.events.map((event, idx) => {
+  const cellDate = new Date(selectedYear, monthIndex, dayData.day);
+  cellDate.setHours(0, 0, 0, 0);
 
-                            const start = new Date(event.startDate);
-                            const end = new Date(
-                              event.endDate || event.startDate
-                            );
+  const start = new Date(event.startDate);
+  const end = event.endDate ? new Date(event.endDate) : new Date(event.startDate);
+  
+  // Reset times to compare dates only
+  const startDay = new Date(start);
+  startDay.setHours(0, 0, 0, 0);
+  
+  const endDay = new Date(end);
+  endDay.setHours(0, 0, 0, 0);
 
-                            // Parse hours/minutes safely
-                            const [sh, sm] = event.startTime
-                              ? event.startTime.split(":")
-                              : [0, 0];
-                            const [eh, em] = event.endTime
-                              ? event.endTime.split(":")
-                              : [23, 59];
+  const color = "#44ff44"; // Green for booked
 
-                            start.setHours(parseInt(sh, 10), parseInt(sm, 10));
-                            end.setHours(parseInt(eh, 10), parseInt(em, 10));
+  // Check if cell date is within the event date range
+  if (cellDate >= startDay && cellDate <= endDay) {
+    // Parse times from the normalized format
+    const startTime = event.startTime || "00:00";
+    const endTime = event.endTime || "23:59";
+    
+    const [sh, sm] = startTime.split(":");
+    const [eh, em] = endTime.split(":");
+    
+    const startHour = parseInt(sh, 10);
+    const endHour = parseInt(eh, 10);
 
-                            const color =
-                              (event.mahal || event.Mahal) === "TTV"
-                                ? "#ff4444"
-                                : "#44ff44";
+    // For same day events
+    if (startDay.getTime() === endDay.getTime() && cellDate.getTime() === startDay.getTime()) {
+      // Full day or spanning morning to evening
+      if ((startHour <= 6 && endHour >= 18) || (startTime === "00:00" && endTime === "23:59")) {
+        return (
+          <Box
+            key={idx}
+            sx={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              backgroundColor: color,
+              opacity: 0.9,
+            }}
+          />
+        );
+      }
+      // Morning only
+      else if (endHour <= 12) {
+        return (
+          <Box
+            key={idx}
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "50%",
+              backgroundColor: color,
+              opacity: 0.9,
+            }}
+          />
+        );
+      }
+      // Afternoon only
+      else if (startHour >= 12) {
+        return (
+          <Box
+            key={idx}
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "50%",
+              backgroundColor: color,
+              opacity: 0.9,
+            }}
+          />
+        );
+      }
+      // Default: full cell
+      else {
+        return (
+          <Box
+            key={idx}
+            sx={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              backgroundColor: color,
+              opacity: 0.9,
+            }}
+          />
+        );
+      }
+    }
+    // Multi-day events
+    else {
+      // First day of event
+      if (cellDate.getTime() === startDay.getTime()) {
+        if (startHour >= 12) {
+          return (
+            <Box
+              key={idx}
+              sx={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: "50%",
+                backgroundColor: color,
+                opacity: 0.9,
+              }}
+            />
+          );
+        } else {
+          return (
+            <Box
+              key={idx}
+              sx={{
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                backgroundColor: color,
+                opacity: 0.9,
+              }}
+            />
+          );
+        }
+      }
+      // Last day of event
+      else if (cellDate.getTime() === endDay.getTime()) {
+        if (endHour <= 12) {
+          return (
+            <Box
+              key={idx}
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: "50%",
+                backgroundColor: color,
+                opacity: 0.9,
+              }}
+            />
+          );
+        } else {
+          return (
+            <Box
+              key={idx}
+              sx={{
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                backgroundColor: color,
+                opacity: 0.9,
+              }}
+            />
+          );
+        }
+      }
+      // Middle days - full coverage
+      else {
+        return (
+          <Box
+            key={idx}
+            sx={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              backgroundColor: color,
+              opacity: 0.9,
+            }}
+          />
+        );
+      }
+    }
+  }
 
-                            // 👉 Case 1: Event start day
-                            if (
-                              cellDate.toDateString() === start.toDateString()
-                            ) {
-                              if (sh >= 12) {
-                                // Afternoon start -> mark bottom half
-                                return (
-                                  <Box
-                                    key={idx}
-                                    sx={{
-                                      position: "absolute",
-                                      bottom: 0,
-                                      left: 0,
-                                      right: 0,
-                                      height: "50%",
-                                      backgroundColor: color,
-                                      opacity: 0.9,
-                                    }}
-                                  />
-                                );
-                              } else if (sh > 0) {
-                                // Morning start (not midnight) -> mark top half
-                                return (
-                                  <Box
-                                    key={idx}
-                                    sx={{
-                                      position: "absolute",
-                                      top: 0,
-                                      left: 0,
-                                      right: 0,
-                                      height: "50%",
-                                      backgroundColor: color,
-                                      opacity: 0.9,
-                                    }}
-                                  />
-                                );
-                              }
-                            }
+  return null;
+})}
 
-                            // 👉 Case 2: Event end day
-                            if (
-                              cellDate.toDateString() === end.toDateString()
-                            ) {
-                              if (eh <= 12) {
-                                // Ends in morning -> mark top half
-                                return (
-                                  <Box
-                                    key={idx}
-                                    sx={{
-                                      position: "absolute",
-                                      top: 0,
-                                      left: 0,
-                                      right: 0,
-                                      height: "50%",
-                                      backgroundColor: color,
-                                      opacity: 0.9,
-                                    }}
-                                  />
-                                );
-                              } else if (eh < 23) {
-                                // Ends in afternoon/evening -> mark bottom half
-                                return (
-                                  <Box
-                                    key={idx}
-                                    sx={{
-                                      position: "absolute",
-                                      bottom: 0,
-                                      left: 0,
-                                      right: 0,
-                                      height: "50%",
-                                      backgroundColor: color,
-                                      opacity: 0.9,
-                                    }}
-                                  />
-                                );
-                              }
-                            }
-
-                            // 👉 Case 3: In between full days
-                            if (cellDate > start && cellDate < end) {
-                              return (
-                                <Box
-                                  key={idx}
-                                  sx={{
-                                    position: "absolute",
-                                    top: 0,
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    backgroundColor: color,
-                                    opacity: 0.9,
-                                  }}
-                                />
-                              );
-                            }
-
-                            // 👉 Case 4: Same‑day event
-                            if (
-                              start.toDateString() === end.toDateString() &&
-                              cellDate.toDateString() === start.toDateString()
-                            ) {
-                              // Same‑day with times -> still full because spans within the day
-                              return (
-                                <Box
-                                  key={idx}
-                                  sx={{
-                                    position: "absolute",
-                                    top: 0,
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    backgroundColor: color,
-                                    opacity: 0.9,
-                                  }}
-                                />
-                              );
-                            }
-
-                            return null;
-                          })}
 
                           {/* Top Section (Day + Weekday) */}
                           <Box
@@ -1506,6 +1611,21 @@ const handleDeleteEvent = async (eventId) => {
                   flexDirection: { xs: "column", sm: "row" },
                 }}
               >
+              <TextField
+  label="Person Name"
+  value={newEventPersonName}
+  onChange={(e) => setNewEventPersonName(e.target.value)}
+  fullWidth
+/>
+
+<TextField
+  label="Mobile Number"
+  type="tel"
+  value={newEventMobileNumber}
+  onChange={(e) => setNewEventMobileNumber(e.target.value)}
+  fullWidth
+/>
+
                 <TextField
                   label="Event Start Date"
                   type="date"
@@ -1628,6 +1748,13 @@ const handleDeleteEvent = async (eventId) => {
                           primary={event.Title || event.title}
                           secondary={
                             <Box>
+                            <Typography variant="body2">
+  Person: {event.personName || "N/A"}
+</Typography>
+<Typography variant="body2">
+  Mobile: {event.mobileNumber || "N/A"}
+</Typography>
+
                               <Typography variant="body2">
                                 Start:{" "}
                                 {formatDateTime(
@@ -1713,7 +1840,6 @@ const handleDeleteEvent = async (eventId) => {
           </Button>
         </Box>
       </Link>
-      <Footer handleOpenModal={handleOpenModal}/>
     </>
   );
 };
