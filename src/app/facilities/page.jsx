@@ -7,41 +7,57 @@ import {
   Card,
   CardContent,
   Typography,
+  Button,
   useTheme,
   useMediaQuery,
-  Button,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
+import { FiberManualRecord } from "@mui/icons-material";
+import EcoFriendly from "@/Components/EcoFriendly";
 
-// Facility data
-const facilities = [
-  { title: "Spacious Parking", image: "/facilities/parking.jpg" },
-  { title: "Modern Kitchen", image: "/facilities/kitchen.jpg" },
-  { title: "Outdoor Lawn", image: "/facilities/outdoor.jpg" },
-  { title: "Indoor Halls", image: "/facilities/indoor.jpg" },
-  { title: "Banquet Hall", image: "/facilities/hall.jpg" },
-  { title: "VIP Rooms", image: "/facilities/room.jpg" },
-  { title: "Decoration Setup", image: "/facilities/decor.jpg" },
-  { title: "Lighting & Sound", image: "/facilities/sound.jpg" },
+// Facilities grouped by section
+const mainMahalFacilities = [
+  { title: "Hall Seating", image: "/gallery/gal5.JPG" },
+  { title: "Dining Hall", image: "/gallery/gal2.JPG" },
+  { title: "Banquet Hall", image: "/gallery/gal2.JPG" },
+  { title: "Parking Area", image: "/gallery/gal14.JPG" },
+  { title: "Stage", image: "/gallery/gal4.JPG" },
+  // { title: "Outdoor Lawn", image: "/gallery/gal1.JPG" },
+  { title: "Temple View", image: "/gallery/gal9.JPG" },
+  { title: "Decoration Setup", image: "/gallery/gal13.JPG" },
+  // { title: "Lighting & Sound", image: "/gallery/gal7.JPG" },
 ];
 
-// Animations
+const miniMahalFacilities = [
+  { title: "Hall Seating ", image: "/gallery/gal5.JPG" },
+  { title: "Dining Hall", image: "/gallery/gal2.JPG" },
+  { title: "Banquet Hall", image: "/gallery/gal2.JPG" },
+  { title: "Parking Area", image: "/gallery/gal14.JPG" },
+  { title: "Stage", image: "/gallery/gal4.JPG" },
+  // { title: "Outdoor Lawn", image: "/gallery/gal1.JPG" },
+  { title: "Temple View", image: "/gallery/gal9.JPG" },
+  { title: "Decoration Setup", image: "/gallery/gal13.JPG" },
+  // { title: "Lighting & Sound", image: "/gallery/gal7.JPG" },
+];
+
+// Framer Motion Animations
 const containerVariants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.25, ease: "easeOut" },
+    transition: { staggerChildren: 0.2, ease: "easeOut" },
   },
 };
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 50, scale: 0.95 },
+  hidden: { opacity: 0, y: 40, scale: 0.95 },
   show: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.7, ease: "easeOut" },
+    transition: { duration: 0.6, ease: "easeOut" },
   },
 };
 
@@ -49,39 +65,211 @@ export default function FacilitiesPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  // Reusable Grid Section
+const FacilitiesGrid = ({ facilities }) => (
+  <motion.div
+    variants={containerVariants}
+    initial="hidden"
+    whileInView="show"
+    viewport={{ once: true, margin: "-100px" }}
+    style={{ marginTop: "2rem" }}
+  >
+    <Grid container display={'grid'} gridTemplateColumns={{ xs: "repeat(1, 1fr)", sm: "repeat(2, 1fr)", md: "repeat(4, 1fr)" }} spacing={4} sx={{ px: { xs: 2, sm: 4, md: 8 } }}>
+      {facilities.map((facility, index) => (
+        <Grid item xs={12} sm={6} md={4} key={index}>
+          <motion.div
+            variants={cardVariants}
+            whileHover={{ scale: 1.05, translateY: -8 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
+            <Card
+              elevation={0}
+              sx={{
+                borderRadius: 3,
+                overflow: "hidden",
+                height: 380,
+                width: 320,
+                display: "flex",
+                flexDirection: "column",
+                background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                position: "relative",
+                '&:hover': {
+                  boxShadow: "0 12px 48px rgba(0,0,0,0.12)",
+                },
+                transition: "all 0.3s ease-in-out"
+              }}
+            >
+              {/* Gradient Accent */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 4,
+                  background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+                }}
+              />
+
+              {/* Image Section */}
+              <Box
+                sx={{
+                  position: "relative",
+                  width: "100%",
+                  height: 320,
+                  overflow: "hidden",
+                  '&:hover .facility-img': {
+                    transform: "scale(1.1)",
+                  }
+                }}
+              >
+                <Image
+                  src={facility.image}
+                  alt={facility.title}
+                  fill
+                  style={{
+                    objectFit: "cover",
+                    transition: "transform 0.6s ease",
+                  }}
+                  className="facility-img"
+                />
+                
+                {/* Gradient Overlay */}
+                <Box
+                  sx={{
+                    position: "absolute",
+                    inset: 0,
+                    background: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 100%)",
+                  }}
+                />
+              </Box>
+
+              {/* Card Content */}
+              <CardContent
+                sx={{
+                  // flexGrow: 1,
+                  textAlign: "center",
+                  // px: 3,
+                  // py: 3,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  background: "transparent",
+                }}
+              >
+                {/* Title */}
+                <Typography
+                  variant="h6"
+                  fontWeight={700}
+                  sx={{
+                    background: "linear-gradient(135deg, #2d3748 0%, #4a5568 100%)",
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    // mb: 2,
+                    fontSize: "1.25rem",
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {facility.title}
+                </Typography>
+
+                {/* Description */}
+                {/* {facility.description && (
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "#718096",
+                      fontSize: "0.9rem",
+                      lineHeight: 1.5,
+                      fontWeight: 400,
+                      display: "-webkit-box",
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {facility.description}
+                  </Typography>
+                )} */}
+
+                {/* Feature Indicator */}
+                {/* <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    mt: 2,
+                    pt: 2,
+                    borderTop: "1px solid rgba(0,0,0,0.05)",
+                  }}
+                >
+                  <FiberManualRecord 
+                    sx={{ 
+                      fontSize: 8, 
+                      color: "#48bb78",
+                      mr: 1 
+                    }} 
+                  />
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "#718096",
+                      fontWeight: 500,
+                      fontSize: "0.75rem",
+                    }}
+                  >
+                    Available Now
+                  </Typography>
+                </Box> */}
+              </CardContent>
+            </Card>
+          </motion.div>
+        </Grid>
+      ))}
+    </Grid>
+  </motion.div>
+);
+
+
+
+
   return (
     <>
       <Box sx={{ backgroundColor: "#fff", minHeight: "100vh", width: "100%" }}>
-        
-        {/* Hero Banner Full Width */}
+        {/* Hero Banner Common Header */}
         <motion.div
-          initial={{ opacity: 0, scale: 1.1 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 1, ease: "easeOut" }}
         >
           <Box
             sx={{
               width: "100%",
               height: { xs: 280, md: 420 },
-              backgroundImage: "url('/facilites.jpg')",
-              backgroundRepeat: "no-repeat",
-              backgroundAttachment: "fixed",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
+              position: "relative",
               display: "flex",
               justifyContent: "center",
-
               alignItems: "center",
               textAlign: "center",
               color: "#fff",
-              position: "relative",
             }}
           >
+            <Image
+              src="/facilites.jpg"
+              alt="Facilities banner"
+              fill
+              priority
+              style={{ objectFit: "cover" }}
+            />
             <Box
               sx={{
                 position: "absolute",
                 inset: 0,
-                background: "linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.4))",
+                background:
+                  "linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.4))",
               }}
             />
             <Box sx={{ position: "relative", zIndex: 2, px: 2 }}>
@@ -94,12 +282,7 @@ export default function FacilitiesPage() {
               </Typography>
               <Typography
                 variant="h6"
-                sx={{
-                  maxWidth: 800,
-                  mx: "auto",
-                  fontWeight: 400,
-                  opacity: 0.9,
-                }}
+                sx={{ maxWidth: 800, mx: "auto", fontWeight: 400, opacity: 0.9 }}
               >
                 Premium amenities designed to make every event comfortable,
                 memorable, and world-class.
@@ -137,7 +320,8 @@ export default function FacilitiesPage() {
                   fontSize: "1.1rem",
                   fontWeight: 600,
                   color: "#fff",
-                  background: "linear-gradient(135deg, #F97A00 0%, #FF9800 100%)",
+                  background:
+                    "linear-gradient(135deg, #F97A00 0%, #FF9800 100%)",
                   transition: "all 0.4s ease",
                   boxShadow: "0 8px 25px rgba(249, 122, 0, 0.35)",
                   "&:hover": {
@@ -153,72 +337,57 @@ export default function FacilitiesPage() {
           </motion.div>
         </motion.div>
 
-        {/* Facilities Grid Full Width */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-100px" }}
-          style={{ marginTop: "4rem", width: "100%" }}
+        {/* SECTION 1 - MAIN MAHAL */}
+        <Box
+          sx={{
+            mt: "4rem",
+            py: 6,
+            backgroundImage: "url('/gallery/gal8.JPG')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            position: "relative",
+          }}
         >
-          <Grid
-            container
-            spacing={3}
-            sx={{ px: { xs: 2, sm: 4, md: 6 }, maxWidth: "100%" }}
-          >
-            {facilities.map((facility, index) => (
-              <Grid item xs={12} sm={6} md={3} key={index}>
-                <motion.div
-                  variants={cardVariants}
-                  whileHover={{
-                    scale: 1.05,
-                    translateY: -6,
-                  }}
-                  transition={{ type: "spring", stiffness: 200 }}
-                >
-                  <Card
-                    elevation={4}
-                    sx={{
-                      borderRadius: 3,
-                      overflow: "hidden",
-                      height: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                      textAlign: "center",
-                      transition: "all 0.3s ease",
-                      border: "1px solid #f1f1f1",
-                    }}
-                  >
-                    <Box
-                      component="img"
-                      src={facility.image}
-                      alt={facility.title}
-                      sx={{
-                        width: "100%",
-                        height: { xs: 160, md: 200 },
-                        objectFit: "cover",
-                        transition: "transform 0.4s ease",
-                        "&:hover": { transform: "scale(1.08)" },
-                      }}
-                    />
-                    <CardContent>
-                      <Typography
-                        variant="h6"
-                        fontWeight="bold"
-                        sx={{
-                          color: "#333",
-                          mt: 1,
-                        }}
-                      >
-                        {facility.title}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </Grid>
-            ))}
-          </Grid>
-        </motion.div>
+          <Box
+            sx={{
+              position: "absolute",
+              inset: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.25)",
+            }}
+          />
+          <Box sx={{ position: "relative", zIndex: 2, textAlign: "center", mb: 4 }}>
+            <Typography variant={isMobile ? "h4" : "h3"} fontWeight={700} color="white">
+              Thirumal Thirumagal Vasantha Mahal A/C
+            </Typography>
+          </Box>
+          <FacilitiesGrid facilities={mainMahalFacilities} />
+        </Box>
+<EcoFriendly/>
+        {/* SECTION 2 - MINI MAHAL */}
+        <Box
+          sx={{
+            mt: "4rem",
+            py: 6,
+            backgroundImage: "url('/gallery/gal11.JPG')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            position: "relative",
+          }}
+        >
+          <Box
+            sx={{
+              position: "absolute",
+              inset: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.27)",
+            }}
+          />
+          <Box sx={{ position: "relative", zIndex: 2, textAlign: "center", mb: 4 }}>
+            <Typography variant={isMobile ? "h4" : "h3"} fontWeight={700} color="white">
+            Shri Meenakshi Sundarar Hall A/C
+            </Typography>
+          </Box>
+          <FacilitiesGrid facilities={miniMahalFacilities} />
+        </Box>
       </Box>
 
       {/* FAQ Section */}

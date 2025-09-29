@@ -260,6 +260,7 @@ export default function EventTypesGrid() {
                     >
                       <Image
                         src={event.image}
+                        priority
                         alt={event.title}
                         fill
                         style={{ 

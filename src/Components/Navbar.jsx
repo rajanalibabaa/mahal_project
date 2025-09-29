@@ -32,10 +32,10 @@ import Link from 'next/link';
 
 const navItems = [
   { label: 'Home', href: '/', icon: <HomeIcon /> },
-  { label: 'About Us', href: '/about', icon: <MiscellaneousServicesIcon /> },
-  { label: 'Facilities', href: '/facilities', icon: <ApartmentIcon /> },
-  { label: 'Gallery', href: '/gallery', icon: <CollectionsIcon /> },
-  { label: 'Calendar', href: '/calender', icon: <CalendarMonthIcon /> },
+    { label: 'Booking', href: '/calender', icon: <CalendarMonthIcon /> },
+      { label: 'About Us', href: '/about', icon: <MiscellaneousServicesIcon /> },
+    { label: 'Gallery', href: '/gallery', icon: <CollectionsIcon /> },
+    { label: 'Facilities', href: '/facilities', icon: <ApartmentIcon /> },
   { label: 'Contact Us', href: '/contact', icon: <ContactMailIcon /> }
 ];
 
@@ -224,7 +224,7 @@ export default function Navbar() {
                 }
               }}
             >
-              TTV Mahal A/C
+              TTVM & SMSH Mahal A/C
             </Typography>
 
             {/* Desktop Navigation */}

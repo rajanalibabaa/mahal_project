@@ -1,15 +1,24 @@
-import ProvidingEvents from "@/Components/ProvidingEvents/providingEvent";
+import dynamic from "next/dynamic";
+
+const ProvidingEvents = dynamic(() => import("@/Components/ProvidingEvents/providingEvent"), {
+  loading: () => <p>Loading...</p>, // optional fallback
+});
+
+const FAQSection = dynamic(() => import("@/Components/FaqComponents"));
+const StatsSection = dynamic(() => import("@/Components/StatusSection"));
+
 import HomePage from "./HomePage";
-import FAQSection from "@/Components/FaqComponents";
-import StatsSection from "@/Components/StatusSection";
+import EcoFriendly from "@/Components/EcoFriendly";
 
 export default function Page() {
-    return (
-        <>
-        <HomePage />
-        <ProvidingEvents  />
-        <StatsSection/>
-        <FAQSection/>
-        </>
-    );
+  return (
+    <>
+      <HomePage />
+      <ProvidingEvents />
+            <EcoFriendly/>
+
+      <StatsSection />
+      <FAQSection />
+    </>
+  );
 }

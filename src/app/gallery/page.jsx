@@ -24,57 +24,82 @@ const Gallery = () => {
       title: "Explore Nature",
       description: "Discover the beauty of the natural world",
       image:
-        "/gallery/download.jpg",
+        "/gallery/gal1.JPG",
     },{
       title: "Explore Nature",
       description: "Discover the beauty of the natural world",
       image:
-        "/gallery/download.jpg",
+        "/gallery/gal2.JPG",
     },{
       title: "Explore Nature",
       description: "Discover the beauty of the natural world",
       image:
-        "/gallery/download.jpg",
+        "/gallery/gal3.JPG",
     },{
       title: "Explore Nature",
       description: "Discover the beauty of the natural world",
       image:
-        "/gallery/download.jpg",
+        "/gallery/gal4.JPG",
     },{
       title: "Explore Nature",
       description: "Discover the beauty of the natural world",
       image:
-        "/gallery/download.jpg",
+        "/gallery/gal5.JPG",
     },{
       title: "Explore Nature",
       description: "Discover the beauty of the natural world",
       image:
-        "/gallery/download.jpg",
+        "/gallery/gal6.JPG",
     },{
       title: "Explore Nature",
       description: "Discover the beauty of the natural world",
       image:
-        "/gallery/download.jpg",
+        "/gallery/gal7.JPG",
     },{
       title: "Explore Nature",
       description: "Discover the beauty of the natural world",
       image:
-        "/gallery/download.jpg",
+        "/gallery/gal8.JPG",
     },{
       title: "Explore Nature",
       description: "Discover the beauty of the natural world",
       image:
-        "/gallery/download.jpg",
+        "/gallery/gal9.JPG",
     },{
       title: "Explore Nature",
       description: "Discover the beauty of the natural world",
       image:
-        "/gallery/download.jpg",
-    },{
+        "/gallery/gal10.JPG",
+    },
+    {
       title: "Explore Nature",
       description: "Discover the beauty of the natural world",
       image:
-        "/gallery/download.jpg",
+        "/gallery/gal11.JPG",
+    },
+    {
+      title: "Explore Nature",
+      description: "Discover the beauty of the natural world",
+      image:
+        "/gallery/gal12.JPG",
+    },
+    {
+      title: "Explore Nature",
+      description: "Discover the beauty of the natural world",
+      image:
+        "/gallery/gal13.JPG",
+    },
+    {
+      title: "Explore Nature",
+      description: "Discover the beauty of the natural world",
+      image:
+        "/gallery/gal14.JPG",
+    },
+    {
+      title: "Explore Nature",
+      description: "Discover the beauty of the natural world",
+      image:
+        "/gallery/gal15.JPG",
     },
   ]
   
@@ -158,6 +183,7 @@ const Gallery = () => {
                 <CardMedia
                   component="img"
                   height="200"
+                  
                   image={item.image}
                   alt={item.title}
                   sx={{ width: "100%", objectFit: "cover" }}

@@ -43,48 +43,49 @@ export default function ContactPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+    // const handleSubmit = async (e) => {
+    //   e.preventDefault();
+    //   setLoading(true);
 
-    try {
-      const response = await fetch(
-        "https://script.google.com/macros/s/AKfycbzuaevkc_4Xc3qAfq7PDvNELmeudeiCPEm6JmLj618CtNLzxVGTyuMfkjRXTjtFMUjM/exec",
-        {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
-      );
+    //   try {
+    //     const response = await fetch(
+    //       "https://formsubmit.co/admin@thirumalthirumagal.com",
+    //       // "https://script.google.com/macros/s/AKfycbzuaevkc_4Xc3qAfq7PDvNELmeudeiCPEm6JmLj618CtNLzxVGTyuMfkjRXTjtFMUjM/exec",
+    //       {
+    //         method: "POST",
+    //         mode: "no-cors",
+    //         headers: { "Content-Type": "application/json" },
+    //         body: JSON.stringify(formData),
+    //       }
+    //     );
 
-      console.log("res :", response);
+    //     console.log("res :", response);
 
-      setFormData({
-        name: "",
-        number: "",
-        altNumber: "",
-        message: "",
-        startDateTime: "",
-        endDateTime: "",
-      });
+    //     setFormData({
+    //       name: "",
+    //       number: "",
+    //       altNumber: "",
+    //       message: "",
+    //       startDateTime: "",
+    //       endDateTime: "",
+    //     });
 
-      setDialog({
-        open: true,
-        message: "Form submitted successfully!",
-        success: true,
-      });
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      setDialog({
-        open: true,
-        message: "Failed to submit form. Please try again.",
-        success: false,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    //     setDialog({
+    //       open: true,
+    //       message: "Form submitted successfully!",
+    //       success: true,
+    //     });
+    //   } catch (error) {
+    //     console.error("Error submitting form:", error);
+    //     setDialog({
+    //       open: true,
+    //       message: "Failed to submit form. Please try again.",
+    //       success: false,
+    //     });
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
 
   return (
     <>
@@ -102,6 +103,7 @@ export default function ContactPage() {
   <Image
     src="/contact.jpg"
     alt="Contact"
+    priority
     fill   // fills parent container
     style={{
       objectFit: "cover",
@@ -113,8 +115,7 @@ export default function ContactPage() {
     variant="h3"
     sx={{ color: "#fff", fontWeight: "bold", position: "relative" }}
   >
-    Contact Us
-      <Typography variant="subtitle1">We’d love to hear from you. Get in touch today!</Typography>
+Enquiry us      <Typography variant="subtitle1">We’d love to hear from you. Get in touch today!</Typography>
 
   </Typography>
 </Box>
@@ -148,11 +149,15 @@ export default function ContactPage() {
             mb: 4,
           }}
         >
-           Booking
+           Enquiry us
         </Typography>
 
         {/* Form */}
-        <form onSubmit={handleSubmit}>
+        <form action="https://formsubmit.co/e818635b854b9f8665a49ee041e753d6"
+              method="POST">
+            <input type="hidden" name="_captcha" value="false" />
+  <input type="hidden" name="_subject" value="New Enquiry from Website" />
+  <input type="hidden" name="_next" value="https://thirumalthirumagal.com" />
           {/* Name */}
           <TextField
             fullWidth
@@ -448,17 +453,17 @@ export default function ContactPage() {
           <IconButton
             color="error"
             onClick={() =>
-              (window.location.href = "mailto:info@yourmahal.com")
+              (window.location.href = "mailto:admin@thirumalthirumagal.com")
             }
           >
             <EmailIcon fontSize="large" />
           </IconButton>
           <Typography
             component="a"
-            href="mailto:info@yourmahal.com"
+            href="mailto:admin@thirumalthirumagal.com"
             sx={{ textDecoration: "none", color: "inherit" }}
           >
-            info@yourmahal.com
+            admin@thirumalthirumagal.com
           </Typography>
         </Box>
       </Box>

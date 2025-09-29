@@ -18,15 +18,16 @@ const faqs = [
     answer:
       "The Mahal can hold up to 1000+ guests comfortably for weddings, receptions, and other functions.",
   },
+  
   {
     question: "Do you provide catering?",
     answer:
-      "Yes, catering services are available with both vegetarian and non-vegetarian options.",
+      "Yes, catering services are available with only vegetarian .",
   },
   {
     question: "Can we bring our own caterers or decorators?",
     answer:
-      "Yes, outside caterers and decorators are allowed with prior permission.",
+      "No, outside caterers and decorators are allowed with prior permission.",
   },
   {
     question: "Is parking available?",
@@ -34,12 +35,12 @@ const faqs = [
   },
   {
     question: "Is the hall air-conditioned?",
-    answer: "Yes, we have both AC and non-AC halls available.",
+    answer: "Yes, we have  AC  available.",
   },
   {
     question: "What facilities are included?",
     answer:
-      "Basic stage, seating, lighting, and sound system are included. Additional services like catering, decoration, and photography can be arranged.",
+      "Basic stage, seating, lighting,  Additional services like catering, decoration, and photography can be arranged.",
   },
   {
     question: "Do you have rooms for the bride and guests?",
@@ -48,7 +49,7 @@ const faqs = [
   {
     question: "How early should we book?",
     answer:
-      "It is best to book 3–60 months in advance, especially during peak wedding season.",
+      "It is best to book 3–12 months in advance, especially during peak wedding season.",
   },
   {
     question: "What is your cancellation policy?",

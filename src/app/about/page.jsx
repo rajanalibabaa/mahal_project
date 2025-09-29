@@ -22,11 +22,10 @@ import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
 import KitchenIcon from "@mui/icons-material/Kitchen";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
-import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import GavelIcon from "@mui/icons-material/Gavel";
 import Link from "next/link";
+import EcoFriendly from "@/Components/EcoFriendly";
 
 const MotionBox = motion(Box);
 const MotionCard = motion(Card);
@@ -41,16 +40,18 @@ export default function PricingSection() {
       image: "/firstmahal.jpg",
       color: "#FF6B6B",
       features: [
-        { label: "Rent", icon: <CurrencyRupeeIcon /> },
-        { label: "Caution Deposit / Maintenance charges", icon: <InfoOutlinedIcon /> },
-        { label: "Taxes ( at present 18% )", icon: <GavelIcon /> },
-        { label: "Total Capacity ( persons )", icon: <GroupsIcon /> },
-        { label: "Marriage Hall", icon: <MeetingRoomIcon /> },
-        { label: "Seating Capacity ( persons )", icon: <MeetingRoomIcon /> },
-        { label: "Dining Hall", icon: <MeetingRoomIcon /> },
-        { label: "A/C Rooms ( including Bride and Bridegroom )", icon: <AcUnitIcon /> },
-        { label: "Cooking Vessels and Serving Vessels", icon: <KitchenIcon /> },
-        { label: "Parking space for Cars & Two wheelers", icon: <LocalParkingIcon /> },
+        // { label: "Rent", icon: <CurrencyRupeeIcon /> },
+        // { label: "Caution Deposit / Maintenance charges", icon: <InfoOutlinedIcon /> },
+        // { label: "Taxes ( at present 18% )", icon: <GavelIcon /> },
+        { label: "Total Capacity (1000 - persons )", icon: <GroupsIcon /> },
+        { label: "Marriage Hall (First Floor A/C )", icon: <MeetingRoomIcon /> },
+        { label: "Seating Capacity (650 - persons )", icon: <MeetingRoomIcon /> },
+        { label: "Dining Hall (Ground Floor A/C )", icon: <MeetingRoomIcon /> },
+                { label: " Dining Seating Capacity (250 - persons )", icon: <MeetingRoomIcon /> },
+
+        { label: "A/C Rooms (11 - rooms including Bride and Bridegroom )", icon: <AcUnitIcon /> },
+        { label: "Cooking Vessels and Serving Vessels ( 1000 - Persons Only )", icon: <KitchenIcon /> },
+        { label: "Parking space for Cars & Two wheelers (Common to both) ", icon: <LocalParkingIcon /> },
       ],
     },
     {
@@ -58,16 +59,18 @@ export default function PricingSection() {
       image: "/secondmaha;.jpg",
       color: "#667EEA",
       features: [
-        { label: "Rent", icon: <CurrencyRupeeIcon /> },
-        { label: "Caution Deposit / Maintenance charges", icon: <InfoOutlinedIcon /> },
-        { label: "Taxes ( at present 18% )", icon: <GavelIcon /> },
-        { label: "Total Capacity ( persons )", icon: <GroupsIcon /> },
-        { label: "Marriage Hall", icon: <MeetingRoomIcon /> },
-        { label: "Seating Capacity ( persons )", icon: <MeetingRoomIcon /> },
-        { label: "Dining Hall", icon: <MeetingRoomIcon /> },
-        { label: "A/C Rooms ( including Bride and Bridegroom )", icon: <AcUnitIcon /> },
-        { label: "Cooking Vessels and Serving Vessels", icon: <KitchenIcon /> },
-        { label: "Parking space for Cars & Two wheelers", icon: <LocalParkingIcon /> },
+        // { label: "Rent", icon: <CurrencyRupeeIcon /> },
+        // { label: "Caution Deposit / Maintenance charges", icon: <InfoOutlinedIcon /> },
+        // { label: "Taxes ( at present 18% )", icon: <GavelIcon /> },
+        { label: "Total Capacity (1000 - persons )", icon: <GroupsIcon /> },
+        { label: "Marriage Hall (3rd Floor A/C )", icon: <MeetingRoomIcon /> },
+        { label: "Seating Capacity (600 - persons )", icon: <MeetingRoomIcon /> },
+        { label: "Dining Hall (4th Floor )", icon: <MeetingRoomIcon /> },
+                { label: " Dining Seating Capacity (200 - persons )", icon: <MeetingRoomIcon /> },
+
+        { label: "A/C Rooms (6 - rooms including Bride and Bridegroom )", icon: <AcUnitIcon /> },
+        { label: "Cooking Vessels and Serving Vessels ( 1000 - Persons Only )", icon: <KitchenIcon /> },
+        { label: "Parking space for Cars & Two wheelers (Common to both) ", icon: <LocalParkingIcon /> },
       ],
     },
   ];
@@ -76,7 +79,7 @@ export default function PricingSection() {
     "Mugappu Pandal",
     "Plantain Trees (2 Nos)",
     "Decorative Serial Lights at Mandapam",
-    "Security at Car Parking Area",
+    "Security at Car Parking Area Alone",
     "Water Supply",
     "Gas Cylinder",
     "Electricity",
@@ -90,18 +93,18 @@ export default function PricingSection() {
   ];
 
   const terms = [
-    "Outside Flower and Interior Decorators are not allowed.",
-    "Outside items (Cooking vessels, cameras, sound equipment) need prior approval.",
-    "Stage power usage should not exceed 3000 watts.",
-    "Management is not responsible for valuables or belongings.",
-    "Do not use the Lift for shifting materials.",
-    "Children must be accompanied while using the Lift.",
-    "Bookings must be informed at least one day earlier.",
-    "All Government Rules including CORONA guidelines must be followed.",
-    "Marriage Packages available on request.",
-    "Cancellation not allowed; postponement only. No refund.",
-    "GST charged extra as applicable.",
-    "By booking, you agree to all terms.",
+    "Outside Flower and Interior Decorators are not allowed. Only Mandapam recommended interior decorators are allowed to do all Decorations",
+    "Any outside materials such as Cooking vessels, cameras, Video equipment and Sound Equipment, should be informed to the management and get approval is necessary.",
+    "Should not use more than 3000 watts power at the stage.",
+    "Management are not responsible for your belongings including Gold and Silver valuable items, mobile phones or any other items. You are sole responsible for all the above items.",
+    "Do not use the LIFT for shifting any materials.",
+    "Take care of your children from using Lift without a caretaker.",
+    "Please inform us at least one day earlier for booking, so that it will be done quickly.",
+    "All Government Rules including CORONA guidelines should be accepted and followed.",
+    "Any Marriage Package will be arranged on request.",
+    "Cancellation will not be allowed due to any reason, only postponement is allowed. No refur be given at any point of time for cancellation.",
+    "GST will be charged extra as applicable on the billing date",
+    "I have read all the above points and signing here as acceptance and will abide all.",
   ];
 
   const fadeUp = {
@@ -133,7 +136,7 @@ export default function PricingSection() {
           },
         }}
       >
-        <Image src="/about.jpg" alt="Background" fill style={{ objectFit: "cover" }} />
+        <Image src="/about.jpg" alt="Background" fill style={{ objectFit: "cover" }} priority />
       </Box>
 
       <Container maxWidth="lg" sx={{ py: 5 }}>
@@ -151,7 +154,7 @@ export default function PricingSection() {
                      variant="h1" 
                      className={mounted ? 'animate-on-scroll' : ''}
                      sx={{ 
-                       fontSize: { xs: '2.2rem', sm: '3rem', md: '4rem', lg: '3rem' },
+                       fontSize: { xs: '2rem', sm: '3rem', md: '4rem', lg: '3rem' },
                        fontWeight: 800,
                        textAlign: 'center',
                        lineHeight: 1.5,
@@ -214,7 +217,7 @@ export default function PricingSection() {
               }}
             >
               <Box sx={{ position: "relative", height: 220 }}>
-                <Image src={hall.image} alt={hall.name} fill style={{ objectFit: "cover" }} />
+                <Image src={hall.image} alt={hall.name} fill style={{ objectFit: "cover" }} priority />
                 <Box
                   sx={{
                     position: "absolute",
@@ -233,13 +236,14 @@ export default function PricingSection() {
                 </Box>
               </Box>
               <Box p={3}>
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+                <Box sx={{ display: "flex", flexDirection: 'column', gap: 2 }}>
                   {hall.features.map((f, idx) => (
                     <Box
                       key={idx}
                       sx={{
                         flex: { xs: "1 1 100%", md: "1 1 48%" },
                         display: "flex",
+                        
                         alignItems: "center",
                         gap: 2,
                         p: 1.5,
@@ -260,42 +264,22 @@ export default function PricingSection() {
             </MotionCard>
           ))}
         </Box>
+        <Typography fontWeight={500} color="#000000ff" fontSize={{ xs: '1rem', sm: '1.2rem', md: '1.4rem', lg: '1rem' }} mt={{xs: 2, md: 8}} sx={{textAlign: 'center'}}> ** Rental and Caution Deposit/Maintenance Charges is Applicable for the following and Taxes ( at present 18% ),for your reference contact Management ...</Typography>
  <Typography fontWeight={800} color="#ff0000ff" fontSize={{ xs: '1rem', sm: '1.2rem', md: '1.4rem', lg: '1.2rem' }} mt={{xs: 2, md: 4}} sx={{textAlign: 'center'}} >
-               Day Rent Timing: (2 PM – 2 PM) hr.
+              Timing: (2 PM – 2 PM) hr.
             </Typography> 
                 {/* Note */}
-       <Fade in={mounted} timeout={800}>
-  <Paper
-    elevation={0}
-    sx={{
-      p: 3,
-      borderRadius: 4,
-      mb: 8,
-      mt: 8,
-      // backdropFilter: "blur(10px)",
-      // background: alpha("#8e44ad", 0.85), // semi-transparent purple background
-      textAlign: "center",
-    }}
-  >
-    <Typography fontWeight={400} color="error" textAlign={"start"} letterSpacing={2}> {/* white text for contrast */}
-     *** CAUTION: For the Caution Deposit/Maintenance charges following services
+
+        {/* Services Covered */}
+        <Box mt={{ xs: 2, md: 10 }} sx={{ background: "#ffffffff", p: "1.2rem", borderRadius: "20px" }}>
+          <Typography fontSize={{ xs: "1.2rem", md: "2rem" }} textAlign="center" fontWeight={800} mb={4}>
+            Services Covered in Caution Deposit
+          </Typography>
+           <Typography fontWeight={400} color="error" textAlign={"start"} letterSpacing={2} mb={{xs: 2, md: 4}} fontSize={{ xs: "1rem", md: "1.2rem" }}> {/* white text for contrast */}
+     *CAUTION: For the Caution Deposit/Maintenance charges following services
       will be provided (will vary depending upon the consumption of
       Electricity and Gas)
     </Typography>
-  </Paper>
-</Fade>
-
-
-       
-
-       
-
-
-        {/* Services Covered */}
-        <Box mt={10} sx={{ background: "#ffffffff", p: "1.2rem", borderRadius: "20px" }}>
-          <Typography variant="h3" textAlign="center" fontWeight={800} mb={4}>
-            Services Covered in Caution Deposit
-          </Typography>
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
             {cautionServices.map((s, idx) => (
               <Box
@@ -308,8 +292,8 @@ export default function PricingSection() {
                   p: 2,
                   borderRadius: 3,
                   // bgcolor: alpha("#667EEA", 0.04),
-                  "&:hover": { bgcolor: alpha("#667EEA", 0.1) },
-                  transition: "0.2s",
+                  // "&:hover": { bgcolor: alpha("#667EEA", 0.1) },
+                  // transition: "0.2s",
                 }}
               >
                 <CheckCircleIcon color="primary" fontSize="small" />
@@ -318,7 +302,24 @@ export default function PricingSection() {
             ))}
           </Box>
         </Box>
- <Link href={"/contact"} >
+ 
+         {/* Note */}
+        <Fade in={mounted} timeout={800}>
+  <Paper
+    elevation={0}
+    sx={{
+      // backdropFilter: "blur(10px)",
+      // background: alpha("#4a90e2", 0.85), // changed background color
+      textAlign: "center",
+    }}
+  >
+    <Typography fontWeight={400} color="error" letterSpacing={2} textAlign={'start'}> {/* changed text color */}
+      *NOTE: Generator running charges will be extra
+      per hour basic during Electricity / power cut.
+    </Typography>
+  </Paper>
+</Fade>
+<Link href={"/contact"} >
         <Box textAlign="center" mt={3}>
           <Button
             variant="contained"
@@ -341,30 +342,10 @@ export default function PricingSection() {
           </Button>
         </Box>
         </Link>
-         {/* Note */}
-        <Fade in={mounted} timeout={800}>
-  <Paper
-    elevation={0}
-    sx={{
-      p: 3, 
-      borderRadius: 4,
-      mb: 8,
-      mt: 8,
-      // backdropFilter: "blur(10px)",
-      // background: alpha("#4a90e2", 0.85), // changed background color
-      textAlign: "center",
-    }}
-  >
-    <Typography fontWeight={400} color="error" letterSpacing={2} textAlign={'start'}> {/* changed text color */}
-      *** NOTE:  Generator Stand by Charges: Generator running charges will be extra
-      per hour basic during Electricity / power cut. Other Terms & Conditions
-    </Typography>
-  </Paper>
-</Fade>
 
         {/* Terms & Conditions */}
-        <Box mt={10} sx={{ background: "#ffffffff", p: "1.2rem", borderRadius: "20px" }}>
-          <Typography variant="h3" textAlign="center" fontWeight={800} mb={4}>
+        <Box mt={{ xs: 2, md: 10 }} sx={{ background: "#ffffffff", p: "1.2rem", borderRadius: "20px" }}>
+          <Typography fontSize={{ xs: "1.5rem", md: "2rem" }} textAlign="center" fontWeight={800} mb={4}>
             Terms & Conditions
           </Typography>
           <Paper
@@ -395,7 +376,7 @@ export default function PricingSection() {
             variant="contained"
             startIcon={<EventAvailableIcon />}
             sx={{
-              mb: "20px",
+              // mb: "20px",
               px: 6,
               py: 2,
               borderRadius: 99,
@@ -412,7 +393,10 @@ export default function PricingSection() {
           </Button>
         </Box>
         </Link>
+        
       </Container>
+              <EcoFriendly/>
+
     </Box>
   );
 }

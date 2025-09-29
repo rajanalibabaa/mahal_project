@@ -41,7 +41,7 @@ export default function Footer() {
       sx={{
         backgroundColor: "primary.main",
         color: "white",
-        mt: 8,
+        mt: 3,
         pt: 6,
         pb: 3,
       }}
@@ -82,7 +82,7 @@ export default function Footer() {
               📞 26545656, 26545757, 9444048899
             </Typography>
             <Typography variant="body2" sx={{ mb: 1 }}>
-              📧 mahal@gmail.com
+              📧 admin@thirumalthirumagal.com
             </Typography>
             <Typography variant="body2">⏰ 08:00 AM – 08:00 PM</Typography>
           </Grid>
@@ -160,7 +160,7 @@ export default function Footer() {
           }}
         >
           <Typography component={"span"} sx={{ opacity: 0.85 }}>
-            © {new Date().getFullYear()} TTVM & SMSH. All Rights Reserved.
+            © {new Date().getFullYear()} Thirumal Thirumagal Vasantha Mahal. All Rights Reserved.
             <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
             <Typography
               variant="caption"

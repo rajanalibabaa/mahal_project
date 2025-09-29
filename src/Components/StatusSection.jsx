@@ -2,6 +2,7 @@
 
 import { Box, Grid, Card, CardContent, Typography, useTheme, useMediaQuery,Button } from "@mui/material";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import CountUp from "react-countup";
 
@@ -9,7 +10,7 @@ const statsData = [
   {
     count: 10000,
     suffix: "+",
-    subtitle: "Happy Couples",
+    subtitle: "Happy Customers",
     image: "/status1.jpg",
     gradient: "#f84f4fff",
   },
@@ -91,7 +92,7 @@ export default function StatsSection() {
             backgroundClip: "text",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
-            fontSize: { xs: "2.5rem", md: "3.5rem" },
+            fontSize: { xs: "2rem", md: "3.5rem" },
             letterSpacing: "-0.02em",
             textShadow: "0 4px 20px rgba(0,0,0,0.1)",
           }}
@@ -122,7 +123,7 @@ export default function StatsSection() {
               >
                 <CardContent>
                   <Box sx={{ display: "inline-flex", justifyContent: "center", mb: 2 }}>
-                    <img src={stat.image} alt={stat.subtitle} style={{ width: 250, height: 200 }} />
+                    <Image src={stat.image} alt={stat.subtitle} width={250} height={200} priority />
                   </Box>
 
                   <Typography
@@ -130,7 +131,17 @@ export default function StatsSection() {
                     fontWeight="bold"
                     sx={{ background: stat.gradient, backgroundClip: "text", WebkitTextFillColor: "transparent" }}
                   >
-                    <CountUp start={0} end={stat.count} duration={2} suffix={stat.suffix} enableScrollSpy />
+                    <CountUp
+  start={0}
+  end={stat.count || 0}
+  duration={2.5}
+  suffix={stat.suffix || ""}
+  enableScrollSpy
+>
+  {({ countUpRef }) => (
+    <span ref={countUpRef} />
+  )}
+</CountUp>
                   </Typography>
                   <Typography variant="body1" sx={{ mt: 1 }}>
                     {stat.subtitle}
@@ -164,7 +175,7 @@ export default function StatsSection() {
               >
                 <CardContent>
                   <Box sx={{ display: "inline-flex", justifyContent: "center", mb: 2 }}>
-                    <img src={stat.image} alt={stat.subtitle} style={{ width: 250, height: 200 }} />
+                    <Image src={stat.image} alt={stat.subtitle} width={250} height={200} priority />
                   </Box>
 
                   <Typography
@@ -172,7 +183,17 @@ export default function StatsSection() {
                     fontWeight="bold"
                     sx={{ background: stat.gradient, backgroundClip: "text", WebkitTextFillColor: "transparent" }}
                   >
-                    <CountUp start={0} end={stat.count} duration={2.5} suffix={stat.suffix} enableScrollSpy />
+                  <CountUp
+  start={0}
+  end={stat.count || 0}
+  duration={2.5}
+  suffix={stat.suffix || ""}
+  enableScrollSpy
+>
+  {({ countUpRef }) => (
+    <span ref={countUpRef} />
+  )}
+</CountUp>
                   </Typography>
                   <Typography variant="body1" sx={{ mt: 1 }}>
                     {stat.subtitle}
@@ -192,6 +213,7 @@ export default function StatsSection() {
           <Typography
             variant="h5"
             sx={{ 
+              m: 2,
               mb: 3, 
               color: '#000000ff',
               fontWeight: 600,
@@ -201,7 +223,7 @@ export default function StatsSection() {
             Ready to celebrate your special moment with us now ?
           </Typography>
           <motion.div
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1 }}
             whileTap={{ scale: 0.95 }}
           >
 <Link href="/calender">
