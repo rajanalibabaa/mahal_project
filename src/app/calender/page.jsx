@@ -587,7 +587,7 @@ const handleDeleteEvent = async (eventId) => {
                   </Select>
 
                   {/* Add Event Button */}
-                  {/* <Button
+                  <Button
                     variant="contained"
                     startIcon={<AddIcon />}
                     onClick={handleOpenModal}
@@ -597,7 +597,7 @@ const handleDeleteEvent = async (eventId) => {
                     }}
                   >
                     {isMobile ? "Add" : "Add Event"}
-                  </Button> */}
+                  </Button>
                 </Box>
               </Box>
             </Box>
