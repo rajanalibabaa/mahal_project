@@ -25,6 +25,8 @@ import {
   Alert,
   Popover,
   CircularProgress,
+  DialogContentText,
+  
 } from "@mui/material";
 import {
   ChevronLeft,
@@ -40,6 +42,11 @@ import Footer from "@/Components/Footer";
 
 const YearMonthCalendar = () => {
   const theme = useTheme();
+   const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const [snackbar, setSnackbar] = useState({
@@ -69,7 +76,7 @@ const YearMonthCalendar = () => {
   ];
 
   const url =
-    "https://script.google.com/macros/s/AKfycbwAoMfXvuWjfVgodxhkNSv_GaaT-TjSlorRLj-TJU5YakmK9t5QwnH81CFpK0rfvhq0QQ/exec";
+    "https://script.google.com/macros/s/AKfycbxqC-hbywANtJLLnuyrTlCKsSskbETAjPyBDk1OBuEDkNiDQaEYWwU3waz9eC7TGvdrTg/exec";
 
   const today = new Date();
   const [Events, setEvents] = useState([]);
@@ -100,6 +107,29 @@ const YearMonthCalendar = () => {
     }
   };
 
+  function normalizeDate(isoDate, format = "YYYY-MM-DD") {
+    const date = new Date(isoDate);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    if (format === "YYYY-MM-DD") {
+      return `${year}-${month}-${day}`;
+    }
+
+    if (format === "DD/MM/YYYY") {
+      return `${day}/${month}/${year}`;
+    }
+
+    if (format === "MM-DD-YYYY") {
+      return `${month}-${day}-${year}`;
+    }
+
+    // fallback → Local string
+    return date.toLocaleString();
+  }
+
   useEffect(() => {
     const fetchEvents = async () => {
       setLoading(true); // ✅ show loader before fetch
@@ -109,25 +139,22 @@ const YearMonthCalendar = () => {
         });
 
         const data = await res.json();
-        console.log("data:", data);
+        // console.log("data:", data);
 
         if (data.status === "success") {
           const normalized = data.data.map((event) => {
             return {
+              id:event.ID,
               title: event.title || event.Title || "",
-              startDate:
-                event.startDate ||
-                event["Event Start Date"] ||
-                event.date ||
-                event.Date,
-              endDate: event.endDate || event["Event End Date"] || "",
-              startTime: normalizeTime(
-                event.startTime || event["Event Start Time"]
-              ),
-              endTime: normalizeTime(event.endTime || event["Event End Time"]),
+              startDate: normalizeDate(event.startDate || event.StartDate),
+              endDate: normalizeDate(event.EndDate || event.EndDate || ""),
+              startTime: normalizeTime(event.StartTime || ""),
+              endTime: normalizeTime(event.EndTime || ""),
               mahal: event.mahal || event.Mahal || "",
             };
           });
+          console.log("bbb :",customEvents.length)
+          console.log("kkkk :",normalized)
           setCustomEvents(normalized);
         } else {
           console.error("Error:", data.message);
@@ -196,7 +223,7 @@ const YearMonthCalendar = () => {
   const events = useMemo(() => {
     // Filter custom events for the current month and year
     const filteredCustomEvents = customEvents.filter((event) => {
-      console.log("event:", event);
+      // console.log("event:", event);
 
       const eventDate = new Date(
         event.date || event.Date || event.startDate || event.StartDate
@@ -252,6 +279,7 @@ const YearMonthCalendar = () => {
   };
 
   const handleAddEvent = async () => {
+    setLoading(true)
     const data = {
       id: `Event_${Date.now()}`,
       title: newEventTitle,
@@ -278,6 +306,7 @@ const YearMonthCalendar = () => {
       const result = await res.json();
       if (result.status === "success") {
         setCustomEvents(result.data);
+        setLoading(false)
       }
 
       showSnackbar("Event added successfully!", "success");
@@ -287,27 +316,37 @@ const YearMonthCalendar = () => {
     }
   };
 
-const handleDeleteEvent = async (eventId) => {
+  const [eventId,seteventId] = useState("")
+
+const handleDeleteEvent = async (id) => {
+  seteventId(id)
+  setOpen(true)
+};
+
+const handleConfirmDelete = async () => {
+  setLoading(true)
+  setOpen(false);
   try {
     const response = await fetch(url, {
-      method: "POST",  // use POST instead of DELETE
+      method: "POST",
+      mode:"no-cors",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "delete", id: eventId }),
     });
 
-    const result = await response.json();
-
-    if (result.status === "success") {
-      setCustomEvents((prev) => prev.filter((ev) => ev.id !== eventId));
-      showSnackbar("Event deleted successfully!", "success");
-    } else {
-      showSnackbar("Failed to delete event!", "error");
-    }
+      setTimeout(() => {
+        setCustomEvents((prev) => prev.filter((ev) => ev.id !== eventId));
+        showSnackbar("Event deleted successfully!", "success");
+        setLoading(false)
+      }, 1000);
+    
   } catch (err) {
     console.error("Delete error:", err);
     showSnackbar("Error deleting event!", "error");
   }
 };
+
+
 
 
   const isDateInRange = (date, startDate, endDate, startTime, endTime) => {
@@ -416,6 +455,8 @@ const handleDeleteEvent = async (eventId) => {
   // Weekday headers
   const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+
+  
   return (
     <>
       <Box
@@ -1594,73 +1635,8 @@ const handleDeleteEvent = async (eventId) => {
               </TextField>
             </Box>
 
-            {/* List of custom events for the selected month */}
-            {customEvents.filter((event) => {
-              const eventDate = new Date(
-                event.date || event.Date || event.startDate || event.StartDate
-              );
-              return (
-                eventDate.getFullYear() === selectedYear &&
-                eventDate.getMonth() === months.indexOf(selectedMonth)
-              );
-            }).length > 0 && (
-              <Box sx={{ mt: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                  Your Events for {selectedMonth} {selectedYear}
-                </Typography>
-                <List>
-                  {customEvents
-                    .filter((event) => {
-                      const eventDate = new Date(
-                        event.date ||
-                          event.Date ||
-                          event.startDate ||
-                          event.StartDate
-                      );
-                      return (
-                        eventDate.getFullYear() === selectedYear &&
-                        eventDate.getMonth() === months.indexOf(selectedMonth)
-                      );
-                    })
-                    .map((event) => (
-                      <ListItem key={event.id}>
-                        <ListItemText
-                          primary={event.Title || event.title}
-                          secondary={
-                            <Box>
-                              <Typography variant="body2">
-                                Start:{" "}
-                                {formatDateTime(
-                                  event.startDate || event.date || event.Date,
-                                  event.startTime
-                                )}
-                              </Typography>
-                              {event.endDate && (
-                                <Typography variant="body2">
-                                  End:{" "}
-                                  {formatDateTime(event.endDate, event.endTime)}
-                                </Typography>
-                              )}
-                              <Typography variant="body2">
-                                Mahal: {event.mahal || event.Mahal}
-                              </Typography>
-                            </Box>
-                          }
-                        />
-                        <ListItemSecondaryAction>
-                          <IconButton
-                            edge="end"
-                            aria-label="delete"
-                            onClick={() => handleDeleteEvent(event.id)}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </ListItemSecondaryAction>
-                      </ListItem>
-                    ))}
-                </List>
-              </Box>
-            )}
+       
+
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseModal}>Cancel</Button>
@@ -1669,17 +1645,68 @@ const handleDeleteEvent = async (eventId) => {
               variant="contained"
               disabled={!newEventStartDate || !newEventTitle}
             >
-              Add Event
+              {loading === true ? "loading...":"Add Event"}
             </Button>
+            
           </DialogActions>
+
+               {/* List of custom events for the selected month */}
+<DialogContent>
+             {customEvents?.length > 0 && (
+  customEvents?.map((e) => (
+    <Box
+      key={e.id}
+      sx={{
+        border: "1px solid #e0e0e0",
+        borderRadius: 2,
+        p: 2,
+        mb: 2,
+        boxShadow: 1,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
+    >
+      {/* Event details */}
+      <Box>
+        <Typography variant="h6" fontWeight="bold">
+          {e.title || "Untitled Event"}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          🕌 Mahal: {e?.mahal || "-"}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          📅 Start: {e.startDate}
+        </Typography>
+        {e.endDate && (
+          <Typography variant="body2" color="text.secondary">
+            ⏳ End: {e.endDate}
+          </Typography>
+        )}
+      </Box>
+
+      {/* Delete button */}
+      <Button
+        variant="contained"
+        color="error"
+        onClick={() => handleDeleteEvent(e.id)}
+        sx={{ ml: 2 }}
+      >
+        {loading === true ? "loading...":"Delete"}
+      </Button>
+    </Box>
+  ))
+)}
+</DialogContent>
         </Dialog>
+        
 
         {/* Snackbar for notifications */}
         <Snackbar
           open={snackbar.open}
           autoHideDuration={6000}
           onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
         >
           <Alert
             onClose={handleCloseSnackbar}
@@ -1714,6 +1741,27 @@ const handleDeleteEvent = async (eventId) => {
         </Box>
       </Link>
       <Footer handleOpenModal={handleOpenModal}/>
+            <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
+      >
+        <DialogTitle id="delete-dialog-title">Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="delete-dialog-description">
+            Are you sure you want to delete this event date.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} color="error" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
